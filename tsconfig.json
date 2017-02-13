@@ -1,0 +1,14 @@
+{
+        "compilerOptions": {
+                "module": "commonjs",
+                "target": "es5",
+                "lib": [
+                       "dom","es5","scripthost"
+                ],
+                "declaration": true,
+                "outDir": "./out"
+        },
+        "filesGlob": [
+                "./src/**/*.ts"
+        ]
+}

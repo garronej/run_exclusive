@@ -1,0 +1,25 @@
+{
+  "name": "ts-exec-stack",
+  "version": "1.0.0",
+  "description": "A lib to stack function",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/garronej/ts-exec-stack.git"
+  },
+  "main": "./out/lib/index.js",
+  "types": "./out/lib/index.d.ts",
+  "scripts": {
+    "postinstall": "npm run build",
+    "build": "npm run tsc",
+    "generate-async": "node ./src/lib/generateAsync",
+    "tsc": "./node_modules/.bin/tsc -p ./tsconfig.json",
+    "test": "node ./out/test/main"
+  },
+  "author": "Joseph Garrone",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^4.0.0",
+    "typescript": "^2.1.4"
+  },
+  "devDependencies": {}
+}
