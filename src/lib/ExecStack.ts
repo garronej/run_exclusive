@@ -1,9 +1,13 @@
-export function execStack<T extends (...inputs: any[]) => void>(fun: T): T {
+
+export function execStack<T extends (...inputs: any[]) => void>(fun: T): T & {
+    "callStack": Function[],
+    "flushStack": () => void
+} {
 
     let callStack: Function[] = [];
     let isReady = true;
 
-    return function callee(...inputs) {
+    let callee = function (...inputs) {
 
         if (!isReady) {
             callStack.push(callee.bind.apply(callee, [this].concat(inputs)));
@@ -32,7 +36,12 @@ export function execStack<T extends (...inputs: any[]) => void>(fun: T): T {
 
         }]));
 
-
     } as any;
+
+    callee.callStack = callStack;
+
+    callee.flushStack= ()=>{ callStack= []; };
+
+    return callee;
 
 }

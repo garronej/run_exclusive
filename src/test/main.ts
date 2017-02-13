@@ -8,11 +8,12 @@ class MyClass{
 
     public myMethod= execStack((p: string, callback?: (message: string)=> void): void => {
 
+        //Assume callback always defined
+
         setTimeout(()=> {
             let message= this.prop + p;
             console.log("inside: ", message);
-            if( callback )
-                callback(message);
+            callback(message);
         }, 1000);
 
     });
@@ -20,8 +21,18 @@ class MyClass{
 
 }
 
-let i= new MyClass();
+let inst= new MyClass();
 
-i.myMethod("great", message => console.log("outside: ",message));
-i.myMethod("great");
-i.myMethod("great", message => console.log("outside: ",message));
+inst.myMethod("No callback!");
+
+for( let i=0; i<1000; i++)
+    inst.myMethod("great", message => console.log(`outside: ${message}\n`));
+
+console.log("=========>stackLength: ", inst.myMethod.callStack.length);
+
+setTimeout(()=> console.log("=========>stackLength: ", inst.myMethod.callStack.length), 5000);
+
+setTimeout(()=> {
+    console.log("Now we flush the stack");
+    inst.myMethod.flushStack()
+}, 7000);
