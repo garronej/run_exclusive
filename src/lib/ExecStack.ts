@@ -10,7 +10,9 @@ export function execStack<T extends (...inputs: any[]) => void>(fun: T): T & {
     let callee = function (...inputs) {
 
         if (!isReady) {
-            callStack.push(callee.bind.apply(callee, [this].concat(inputs)));
+            //callStack.push(callee.bind.apply(callee, [this].concat(inputs)));
+            callStack.push(()=> callee.apply(this, inputs) );
+
             return;
         }
 
