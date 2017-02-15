@@ -1,22 +1,82 @@
+export type Stack = Function [] & {
+    flush: ()=> void;
+    isReady: boolean;
+}
 
-export function execStack<T extends (...inputs: any[]) => void>(fun: T): T & {
-    "callStack": Function[],
-    "flushStack": () => void
-} {
+function initStack(): Stack{
 
-    let callStack: Function[] = [];
-    let isReady = true;
+    let callStack= [] as Function[];
+
+    return Object.assign(callStack, {
+        "flush": ()=> callStack.splice(0, callStack.length),
+        "isReady": true
+    });
+
+}
+
+interface StackGroupMap{
+    [group: string]: Stack;
+}
+
+let clusters: [any, StackGroupMap][]= [];
+
+function getStack(cluster: Object, group: string): Stack{
+
+    let stackGroupMap: StackGroupMap;
+
+    for( let elem of clusters )
+        if( cluster === elem[0] ){
+            stackGroupMap= elem[1];
+            break;
+        }
+    
+    if( !stackGroupMap ){
+        stackGroupMap= {};
+        clusters.push([cluster, stackGroupMap]);
+    }
+
+    if( !group )
+        group = "_" + Object.keys(stackGroupMap).join("");
+
+    if( !stackGroupMap[group] )
+        stackGroupMap[group] = initStack();
+
+    
+    return stackGroupMap[group];
+
+}
+
+
+export function execStack<T extends (...inputs: any[]) => void>(fun: T): T & { stack: Stack; };
+export function execStack<T extends (...inputs: any[]) => void>(group: string, fun: T): T & { stack: Stack; };
+export function execStack<T extends (...inputs: any[]) => void>(cluster: Object, group: string, fun: T): T & { stack: Stack; };
+export function execStack(...inputs: any[]): any{
+
+    switch(inputs.length){
+        case 1:
+            return __execStack__.apply(null, [undefined, undefined].concat(inputs));
+        case 2:
+            return __execStack__.apply(null, [undefined].concat(inputs));
+        case 3:
+            return __execStack__.apply(null, inputs);
+    }
+
+}
+
+
+function __execStack__<T extends (...inputs: any[]) => void>(cluster: Object, group: string, fun: T): T & { stack: Stack; } {
 
     let callee = function (...inputs) {
 
-        if (!isReady) {
-            //callStack.push(callee.bind.apply(callee, [this].concat(inputs)));
-            callStack.push(()=> callee.apply(this, inputs) );
-
+        if( !callee.stack )
+            callee.stack= getStack(cluster || this, group);
+        
+        if (!callee.stack.isReady) {
+            callee.stack.push(() => callee.apply(this, inputs));
             return;
         }
 
-        isReady = false;
+        callee.stack.isReady = false;
 
         let callback = inputs.pop();
         if (typeof (callback) !== "function") {
@@ -31,18 +91,14 @@ export function execStack<T extends (...inputs: any[]) => void>(fun: T): T & {
             if (callback)
                 callback.apply(this, inputs);
 
-            isReady = true;
+            callee.stack.isReady = true;
 
-            if (callStack.length)
-                callStack.shift()();
+            if (callee.stack.length)
+                callee.stack.shift()();
 
         }]));
 
     } as any;
-
-    callee.callStack = callStack;
-
-    callee.flushStack= ()=>{ callStack= []; };
 
     return callee;
 
