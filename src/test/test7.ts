@@ -10,11 +10,11 @@ class MyClass{
 
     public myMethod1= execStack("GROUP", (char: string, wait: number, callback?: (alphabet: string)=> void): void => {
 
-        //Assume callback always defined
+        let safeCallback= callback || function(){};
 
         setTimeout(()=> {
             this.alphabet+= char;
-            callback(this.alphabet);
+            safeCallback(this.alphabet);
         }, wait);
 
     });
@@ -23,11 +23,11 @@ class MyClass{
 
     public myMethod2= execStack((char: string, wait: number, callback?: (alphabet: string)=> void): void => {
 
-        //Assume callback always defined
+        let safeCallback= callback || function(){};
 
         setTimeout(()=> {
             this.alphabet2+= char;
-            callback(this.alphabet2);
+            safeCallback(this.alphabet2);
         }, wait);
 
     });

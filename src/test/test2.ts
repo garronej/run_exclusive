@@ -11,11 +11,11 @@ class MyClass{
 
     public myMethodUpperCase= execStack("ALPHABET", (char: string, callback?: (alphabet: string)=> void): void => {
 
-        //Assume callback always defined
+        let safeCallback= callback || function(){};
 
         setTimeout(()=> {
             this.alphabetStack+= char.toUpperCase();
-            callback(this.alphabetStack);
+            safeCallback(this.alphabetStack);
         }, Math.random()*1000);
 
     });
@@ -23,11 +23,11 @@ class MyClass{
 
     public myMethod= execStack("ALPHABET", (char: string, callback?: (alphabet: string)=> void): void => {
 
-        //Assume callback always defined
+        let safeCallback= callback || function(){};
 
         setTimeout(()=> {
             this.alphabetStack+= char;
-            callback(this.alphabetStack);
+            safeCallback(this.alphabetStack);
         }, Math.random()*1000);
 
     });

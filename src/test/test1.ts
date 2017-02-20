@@ -8,14 +8,14 @@ class MyClass{
 
     private alphabetStack= "";
 
-
     public myMethodStack= execStack((char: string, callback?: (alphabet: string)=> void): void => {
 
         //Assume callback always defined
+        let safeCallback= callback || function(){};
 
         setTimeout(()=> {
             this.alphabetStack+= char;
-            callback(this.alphabetStack);
+            safeCallback(this.alphabetStack);
         }, Math.random()*1000);
 
     });

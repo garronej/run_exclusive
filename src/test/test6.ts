@@ -11,11 +11,11 @@ class MyClass1{
 
     public myMethod= execStack(cluster, "ALPHABET", (char: string, wait: number, callback?: (alphabet: string)=> void): void => {
 
-        //Assume callback always defined
+        let safeCallback= callback || function(){};
 
         setTimeout(()=> {
             this.alphabet+= char.toUpperCase();
-            callback(this.alphabet);
+            safeCallback(this.alphabet);
         }, wait);
 
     });
@@ -32,10 +32,11 @@ class MyClass2{
     public myMethod= execStack(cluster, "ALPHABET", (char: string, wait: number, callback?: (alphabet: string)=> void): void => {
 
         //Assume callback always defined
-
+        let safeCallback= callback || function(){};
+        
         setTimeout(()=> {
             this.alphabet+= char;
-            callback(this.alphabet);
+            safeCallback(this.alphabet);
         }, wait);
 
     });

@@ -20,9 +20,9 @@ interface StackGroupMap{
 
 let clusters: [any, StackGroupMap][]= [];
 
-function getStack(cluster: Object, group: string): Stack{
+function getStack(cluster: Object, group: string | undefined): Stack{
 
-    let stackGroupMap: StackGroupMap;
+    let stackGroupMap: StackGroupMap | undefined= undefined;
 
     for( let elem of clusters )
         if( cluster === elem[0] ){
@@ -35,7 +35,7 @@ function getStack(cluster: Object, group: string): Stack{
         clusters.push([cluster, stackGroupMap]);
     }
 
-    if( !group )
+    if( group === undefined )
         group = "_" + Object.keys(stackGroupMap).join("");
 
     if( !stackGroupMap[group] )
@@ -64,7 +64,7 @@ export function execStack(...inputs: any[]): any{
 }
 
 
-function __execStack__<T extends (...inputs: any[]) => void>(cluster: Object, group: string, fun: T): T & { stack: Stack; } {
+function __execStack__<T extends (...inputs: any[]) => void>(cluster: Object | undefined, group: string | undefined, fun: T): T & { stack: Stack; } {
 
     let callee = function (...inputs) {
 
