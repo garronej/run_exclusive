@@ -1,9 +1,10 @@
-import { execStack } from "../lib/index";
+//Import StackAccess and Stack to be able to export stacked function
+import { execStack, StackAccess, Stack } from "../lib/index";
 import { VoidSyncEvent } from "ts-events-extended";
 
 require("colors");
 
-class MyClass{
+export class MyClass{
 
     constructor(){};
 
@@ -24,7 +25,7 @@ class MyClass{
 
 }
 
-class MyClassProxy{
+export class MyClassProxy{
 
 
     private myClassInst: MyClass | undefined= undefined;
