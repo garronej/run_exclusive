@@ -1,4 +1,4 @@
-import { execStack, initStack } from "../lib/index";
+import { execStack } from "../lib/index";
 import { VoidSyncEvent } from "ts-events-extended";
 
 require("colors");
