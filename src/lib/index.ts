@@ -1,1 +1,1 @@
-export { execStack, Stack } from "./ExecStack";
+export { execStack, Stack, StackAccess } from "./ExecStack";
