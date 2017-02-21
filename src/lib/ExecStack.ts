@@ -97,13 +97,13 @@ function __execStack__<T extends (...inputs: any[]) => void>(
 
         fun.apply(this, inputs.concat([(...inputs) => {
 
-            if (callback)
-                callback.apply(this, inputs);
-
             callee.stack.isReady = true;
 
             if (callee.stack.length)
                 callee.stack.shift()();
+
+            if (callback)
+                callback.apply(this, inputs);
 
         }]));
 
