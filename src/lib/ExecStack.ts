@@ -46,10 +46,13 @@ function getStack(cluster: Object, group: string | undefined): Stack{
 
 }
 
+export interface StackAccess {
+    stack: Stack;
+}
 
-export function execStack<T extends (...inputs: any[]) => void>(fun: T): T & { stack: Stack; };
-export function execStack<T extends (...inputs: any[]) => void>(group: string, fun: T): T & { stack: Stack; };
-export function execStack<T extends (...inputs: any[]) => void>(cluster: Object, group: string, fun: T): T & { stack: Stack; };
+export function execStack<T extends (...inputs: any[]) => void>(fun: T): T & StackAccess;
+export function execStack<T extends (...inputs: any[]) => void>(group: string, fun: T): T & StackAccess;
+export function execStack<T extends (...inputs: any[]) => void>(cluster: Object, group: string, fun: T): T & StackAccess;
 export function execStack(...inputs: any[]): any{
 
     switch(inputs.length){
@@ -64,13 +67,19 @@ export function execStack(...inputs: any[]): any{
 }
 
 
-function __execStack__<T extends (...inputs: any[]) => void>(cluster: Object | undefined, group: string | undefined, fun: T): T & { stack: Stack; } {
+function __execStack__<T extends (...inputs: any[]) => void>(
+    cluster: Object | undefined,
+    group: string | undefined,
+    fun: T
+): T & StackAccess {
+
+    let stack: Stack | undefined = undefined;
 
     let callee = function (...inputs) {
 
-        if( !callee.stack )
-            callee.stack= getStack(cluster || this, group);
-        
+        if (!stack)
+            stack = getStack(cluster || this, group);
+
         if (!callee.stack.isReady) {
             callee.stack.push(() => callee.apply(this, inputs));
             return;
@@ -99,6 +108,15 @@ function __execStack__<T extends (...inputs: any[]) => void>(cluster: Object | u
         }]));
 
     } as any;
+
+    Object.defineProperty(callee, "stack", {
+        "enumerable": true,
+        "get": (): Stack => {
+            if (stack) return stack;
+
+            return initStack();
+        }
+    });
 
     return callee;
 
