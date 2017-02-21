@@ -1,5 +1,5 @@
-//Import StackAccess and Stack to be able to export stacked function
-import { execStack, StackAccess, Stack } from "../lib/index";
+//Import StackAccess to be able to export stacked function
+import { execStack, StackAccess } from "../lib/index";
 import { VoidSyncEvent } from "ts-events-extended";
 
 require("colors");
