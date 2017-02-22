@@ -6,27 +6,27 @@ class MyClass{
 
     constructor(){};
 
-    private alphabetStack= "";
+    private alphabetStack = "";
 
-    public myMethodStack= execStack((char: string, callback?: (alphabet: string)=> void): void => {
+    public myMethodStack = execStack((char: string, callback?: (alphabet: string) => void): void => {
 
-        setTimeout(()=> {
-            this.alphabetStack+= char;
+        setTimeout(() => {
+            this.alphabetStack += char;
             callback!(this.alphabetStack);
-        }, Math.random()*1000);
+        }, Math.random() * 1000);
 
     });
 
 
 }
 
-let inst= new MyClass();
+let inst = new MyClass();
 
-for( let char of [ "a", "b", "c", "d", "e", "f" ])
-    inst.myMethodStack(char, alphabet=>console.log(`step ${alphabet}`));
+for (let char of ["a", "b", "c", "d", "e", "f"])
+    inst.myMethodStack(char, alphabet => console.log(`step ${alphabet}`));
 
 
-for( let char of [ "g", "h", "i" ])
+for (let char of ["g", "h", "i"])
     inst.myMethodStack(char);
 
 inst.myMethodStack("j", alphabet => {

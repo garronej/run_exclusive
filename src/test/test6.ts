@@ -30,13 +30,10 @@ class MyClass2{
     public alphabet= "";
 
     public myMethod= execStack(cluster, "ALPHABET", (char: string, wait: number, callback?: (alphabet: string)=> void): void => {
-
-        //Assume callback always defined
-        let safeCallback= callback || function(){};
         
         setTimeout(()=> {
             this.alphabet+= char;
-            safeCallback(this.alphabet);
+            callback!(this.alphabet);
         }, wait);
 
     });
