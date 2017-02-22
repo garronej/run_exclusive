@@ -1,61 +1,82 @@
-export type Stack = Function [] & {
-    flush: ()=> void;
-    isReady: boolean;
+export interface ExecStack {
+    queuedCalls: Function[];
+    isRunning: boolean;
+    cancelAllQueuedCalls: ()=> number;
 }
 
-function initStack(): Stack{
+function initExecStack(): ExecStack{
 
-    let callStack= [] as Function[];
+    let queuedCalls= [];
 
-    return Object.assign(callStack, {
-        "flush": ()=> callStack.splice(0, callStack.length),
-        "isReady": true
+    return {
+        "queuedCalls": queuedCalls,
+        "isRunning": false,
+        "cancelAllQueuedCalls": ()=> {
+
+            let n: number;
+
+            queuedCalls.splice(0, n=queuedCalls.length);
+
+            return n;
+            
+        }
+    };
+
+}
+
+
+type ExecStackByGroup = Record<string, ExecStack>;
+
+let clusters: {
+    ref: Object;
+    execStackByGroup: ExecStackByGroup;
+}[] & { get: (ref: Object) => ExecStackByGroup | undefined }
+    = Object.create(Array.prototype, {
+        "get": {
+            value(ref: Object): ExecStackByGroup | undefined {
+
+                let self = this as typeof clusters;
+
+                for (let cluster of self) {
+                    if (cluster.ref === ref) {
+                        return cluster.execStackByGroup;
+                    }
+                }
+
+                return undefined;
+
+            }
+        }
     });
 
-}
 
-interface StackGroupMap{
-    [group: string]: Stack;
-}
+function getStack(clusterRef: Object, group: string | undefined): ExecStack {
 
-let clusters: [any, StackGroupMap][]= [];
+    let execStackByGroup= clusters.get(clusterRef);
 
-function getStack(cluster: Object, group: string | undefined): Stack{
-
-    let stackGroupMap: StackGroupMap | undefined= undefined;
-
-    for( let elem of clusters )
-        if( cluster === elem[0] ){
-            stackGroupMap= elem[1];
-            break;
-        }
-    
-    if( !stackGroupMap ){
-        stackGroupMap= {};
-        clusters.push([cluster, stackGroupMap]);
+    if (!execStackByGroup) {
+        execStackByGroup = {};
+        clusters.push({ "ref": clusterRef, execStackByGroup });
     }
 
-    if( group === undefined )
-        group = "_" + Object.keys(stackGroupMap).join("");
+    if (group === undefined)
+        group = "_" + Object.keys(execStackByGroup).join("");
 
-    if( !stackGroupMap[group] )
-        stackGroupMap[group] = initStack();
+    if (!execStackByGroup[group])
+        execStackByGroup[group] = initExecStack();
 
-    
-    return stackGroupMap[group];
+
+    return execStackByGroup[group];
 
 }
 
-export interface StackAccess {
-    stack: Stack;
-}
 
-export function execStack<T extends (...inputs: any[]) => void>(fun: T): T & StackAccess;
-export function execStack<T extends (...inputs: any[]) => void>(group: string, fun: T): T & StackAccess;
-export function execStack<T extends (...inputs: any[]) => void>(cluster: Object, group: string, fun: T): T & StackAccess;
-export function execStack(...inputs: any[]): any{
+export function execStack<T extends (...inputs: any[]) => void>(fun: T): T & ExecStack;
+export function execStack<T extends (...inputs: any[]) => void>(group: string, fun: T): T & ExecStack;
+export function execStack<T extends (...inputs: any[]) => void>(cluster: Object, group: string, fun: T): T & ExecStack;
+export function execStack(...inputs: any[]): any {
 
-    switch(inputs.length){
+    switch (inputs.length) {
         case 1:
             return __execStack__.apply(null, [undefined, undefined].concat(inputs));
         case 2:
@@ -71,21 +92,21 @@ function __execStack__<T extends (...inputs: any[]) => void>(
     cluster: Object | undefined,
     group: string | undefined,
     fun: T
-): T & StackAccess {
+): T & ExecStack {
 
-    let stack: Stack | undefined = undefined;
+    let stack: ExecStack | undefined = undefined;
 
     let callee = function (...inputs) {
 
         if (!stack)
             stack = getStack(cluster || this, group);
 
-        if (!callee.stack.isReady) {
-            callee.stack.push(() => callee.apply(this, inputs));
+        if (stack.isRunning) {
+            stack.queuedCalls.push(() => callee.apply(this, inputs));
             return;
         }
 
-        callee.stack.isReady = false;
+        stack.isRunning = true;
 
         let callback = inputs.pop();
         if (typeof (callback) !== "function") {
@@ -97,27 +118,39 @@ function __execStack__<T extends (...inputs: any[]) => void>(
 
         fun.apply(this, inputs.concat([(...inputs) => {
 
-            callee.stack.isReady = true;
+            stack!.isRunning = false;
 
-            if (callee.stack.length)
-                callee.stack.shift()();
+            if (stack!.queuedCalls.length)
+                stack!.queuedCalls.shift() !();
 
             if (callback)
                 callback.apply(this, inputs);
 
         }]));
 
-    } as any;
+    };
 
-    Object.defineProperty(callee, "stack", {
-        "enumerable": true,
-        "get": (): Stack => {
-            if (stack) return stack;
-
-            return initStack();
+    Object.defineProperties(callee, {
+        "queuedCalls": {
+            get() {
+                if (!stack) return [];
+                else return stack.queuedCalls;
+            }
+        },
+        "isRunning": {
+            get() {
+                if (!stack) return false;
+                else return stack.isRunning;
+            }
+        },
+        "cancelAllQueuedCalls": {
+            value() {
+                if (!stack) return 0;
+                return stack.cancelAllQueuedCalls();
+            }
         }
     });
 
-    return callee;
+    return callee as T & ExecStack;
 
 }

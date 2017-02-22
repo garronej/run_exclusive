@@ -9,11 +9,9 @@ class MyClass{
 
     public myMethod= execStack(MyClass, "ALPHABET", (char: string, wait: number, callback?: (alphabet: string)=> void): void => {
 
-        let safeCallback= callback || function(){};
-
         setTimeout(()=> {
             this.alphabet+= char;
-            safeCallback(this.alphabet);
+            callback!(this.alphabet);
         }, wait);
 
     });

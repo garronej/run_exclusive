@@ -11,11 +11,9 @@ class MyClass{
 
     public myMethodUpperCase= execStack("ALPHABET", (char: string, callback?: (alphabet: string)=> void): void => {
 
-        let safeCallback= callback || function(){};
-
         setTimeout(()=> {
             this.alphabetStack+= char.toUpperCase();
-            safeCallback(this.alphabetStack);
+            callback!(this.alphabetStack);
         }, Math.random()*1000);
 
     });
@@ -23,11 +21,9 @@ class MyClass{
 
     public myMethod= execStack("ALPHABET", (char: string, callback?: (alphabet: string)=> void): void => {
 
-        let safeCallback= callback || function(){};
-
         setTimeout(()=> {
             this.alphabetStack+= char;
-            safeCallback(this.alphabetStack);
+            callback!(this.alphabetStack);
         }, Math.random()*1000);
 
     });

@@ -10,12 +10,9 @@ class MyClass{
 
     public myMethodStack= execStack((char: string, callback?: (alphabet: string)=> void): void => {
 
-        //Assume callback always defined
-        let safeCallback= callback || function(){};
-
         setTimeout(()=> {
             this.alphabetStack+= char;
-            safeCallback(this.alphabetStack);
+            callback!(this.alphabetStack);
         }, Math.random()*1000);
 
     });

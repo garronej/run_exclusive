@@ -22,11 +22,9 @@ class MyClass{
 
     public myMethod2= execStack((char: string, wait: number, callback?: (alphabet: string)=> void): void => {
 
-        let safeCallback= callback || function(){};
-
         setTimeout(()=> {
             this.alphabet2+= char;
-            safeCallback(this.alphabet2);
+            callback!(this.alphabet2);
         }, wait);
 
     });

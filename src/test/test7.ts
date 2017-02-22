@@ -10,11 +10,9 @@ class MyClass{
 
     public myMethod1= execStack("GROUP", (char: string, wait: number, callback?: (alphabet: string)=> void): void => {
 
-        let safeCallback= callback || function(){};
-
         setTimeout(()=> {
             this.alphabet+= char;
-            safeCallback(this.alphabet);
+            callback!(this.alphabet);
         }, wait);
 
     });
@@ -61,7 +59,7 @@ inst.myMethod2("a", wait, function() {
 
     let expectedDuration= (rev.length+1)*500;
 
-    console.assert( end > expectedDuration && end < expectedDuration + 300 );
+    console.assert( end > expectedDuration && end < expectedDuration + 400 );
 
     console.log("PASS".green);
 
@@ -79,6 +77,6 @@ inst.myMethod1("d", 1000, ()=>{
 
     let expectedDuration= 1000*4;
 
-    console.assert( end > expectedDuration && end < expectedDuration + 300 );
+    console.assert( end > expectedDuration && end < expectedDuration + 400 );
 
 });

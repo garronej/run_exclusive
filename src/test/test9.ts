@@ -11,11 +11,9 @@ class MyClass{
 
     public myMethod= execStack((char: string, callback?: (alphabet: string)=> void): void => {
 
-        let safeCallback= callback || function(){};
-
         setTimeout(()=> {
             this.alphabet+= char;
-            safeCallback(this.alphabet);
+            callback!(this.alphabet);
         }, 1000);
 
     });
@@ -28,11 +26,11 @@ let inst= new MyClass();
 
 setTimeout(()=>{
 
-    console.assert(inst.myMethod.stack.length === 3);
+    console.assert(inst.myMethod.queuedCalls.length === 3);
 
     console.assert(inst.alphabet === "ab");
 
-    inst.myMethod.stack.flush();
+    inst.myMethod.cancelAllQueuedCalls();
 
     setTimeout(()=>{
 

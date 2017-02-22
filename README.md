@@ -4,8 +4,7 @@ Implement a generic stack call to ensure that a particular function
 is executed sequential across calls.
 (we wait until the function has returned before calling again)
 
-Note: Exception can not be catch
-
+Note: Exception can not be caught
 
 #install
 
@@ -26,12 +25,12 @@ class MyClass{
 
     public myMethod= execStack((p: string, callback?: (message: string)=> void): void => {
 
-        //Assume callback always defined
+        //Assume callback always defined the ? is just for the prototype of the exposed method
 
         setTimeout(()=> {
             let message= this.prop + p;
             console.log("inside: ", message);
-            callback(message);
+            callback!(message);
         }, 1000);
 
     });
