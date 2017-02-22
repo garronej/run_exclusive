@@ -87,9 +87,6 @@ export function execStack(...inputs: any[]): any {
 
 }
 
-//ok
-
-
 function __execStack__<T extends (...inputs: any[]) => void>(
     cluster: Object | undefined,
     group: string | undefined,
