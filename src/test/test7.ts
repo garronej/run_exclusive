@@ -52,15 +52,19 @@ for( let char of rev)
     inst.myMethod2(char, wait, alphabet => console.log(alphabet.blue));
 inst.myMethod2("a", wait, function() {
 
-    let end= Date.now() - start;
+    let duration= Date.now() - start;
 
     //cSpell: disable
     console.assert(this.alphabet2 === "nmlkjihgfedcba" );
     //cSpell: enable
 
-    let expectedDuration= (rev.length+1)*500;
+    let expectedDuration= (rev.length+1)*wait;
 
-    console.assert( end > expectedDuration && end < expectedDuration + 400 );
+    console.log("expectedDuration: ", expectedDuration);
+    console.log("duration: ", duration);
+
+    console.assert( Math.abs(duration - expectedDuration) < 300 );
+    console.assert( duration - expectedDuration >= 0 );
 
     console.log("PASS".green);
 
@@ -70,7 +74,7 @@ inst.myMethod2("a", wait, function() {
 inst.myMethod1("c", 1000, alphabet=> console.log(alphabet));
 inst.myMethod1("d", 1000, ()=>{
 
-    let end= Date.now() - start;
+    let duration= Date.now() - start;
 
     //cSpell: disable
     console.assert(inst.alphabet === "abcd" );
@@ -78,6 +82,11 @@ inst.myMethod1("d", 1000, ()=>{
 
     let expectedDuration= 1000*4;
 
-    console.assert( end > expectedDuration && end < expectedDuration + 400 );
+    console.log("expectedDuration: ", expectedDuration);
+    console.log("duration: ", duration);
+
+    console.assert( Math.abs(duration - expectedDuration) < 300 );
+    console.assert( duration - expectedDuration >= 0 );
+
 
 });

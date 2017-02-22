@@ -1,7 +1,6 @@
 import { execStack } from "../lib/index";
 require("colors");
 
-
 class MyClass{
 
     constructor(){};
@@ -38,7 +37,7 @@ for( let char of rev)
     inst2.myMethod(char, wait, alphabet => console.log(alphabet.blue));
 inst2.myMethod("a", wait, function() {
 
-    let end= Date.now() - start;
+    let duration= Date.now() - start;
 
     //cSpell: disable
     console.assert(this.alphabet === "nmlkjihgfedcba" );
@@ -46,7 +45,11 @@ inst2.myMethod("a", wait, function() {
 
     let expectedDuration= (rev.length+1)*500;
 
-    console.assert( end > expectedDuration && end < expectedDuration + 300 );
+    console.log("expectedDuration: ", expectedDuration);
+    console.log("duration: ", duration);
+
+    console.assert( Math.abs( duration - expectedDuration)  < 300 );
+    console.assert( duration - expectedDuration >= 0 );
 
     console.log("PASS".green);
 
@@ -56,7 +59,7 @@ inst2.myMethod("a", wait, function() {
 inst1.myMethod("c", 1000, alphabet=> console.log(alphabet));
 inst1.myMethod("d", 1000, ()=>{
 
-    let end= Date.now() - start;
+    let duration= Date.now() - start;
 
     //cSpell: disable
     console.assert(inst1.alphabet === "abcd" );
@@ -64,6 +67,10 @@ inst1.myMethod("d", 1000, ()=>{
 
     let expectedDuration= 1000*4;
 
-    console.assert( end > expectedDuration && end < expectedDuration + 300 );
+    console.log("expectedDuration: ", expectedDuration);
+    console.log("duration: ", duration);
+
+    console.assert( Math.abs( duration - expectedDuration)  < 300 );
+    console.assert( duration - expectedDuration >= 0 );
 
 });
