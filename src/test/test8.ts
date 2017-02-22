@@ -18,6 +18,7 @@ class MyClass{
 
     });
 
+
     public alphabet2= "";
 
     public myMethod2= execStack((char: string, wait: number, callback?: (alphabet: string)=> void): void => {

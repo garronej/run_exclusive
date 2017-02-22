@@ -2,6 +2,7 @@ import { execStack } from "../lib/index";
 
 require("colors");
 
+
 class MyClass{
 
     constructor(){};

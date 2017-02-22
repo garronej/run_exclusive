@@ -23,6 +23,7 @@ class MyClass1{
 }
 
 
+
 class MyClass2{
 
     constructor(){};

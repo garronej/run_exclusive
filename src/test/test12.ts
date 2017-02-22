@@ -2,6 +2,7 @@
 import { execStack, ExecStack } from "../lib/index";
 import { VoidSyncEvent } from "ts-events-extended";
 
+
 require("colors");
 
 export class MyClass{
