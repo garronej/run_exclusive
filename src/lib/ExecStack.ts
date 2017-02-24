@@ -115,7 +115,7 @@ function __execStack__<T extends (...inputs: any[]) => void>(
             callback = undefined;
         }
 
-        fun.apply(this, inputs.concat([(...inputs) => {
+        let execStackCallback: any= (...inputs) => {
 
             stack!.isRunning = false;
 
@@ -125,7 +125,14 @@ function __execStack__<T extends (...inputs: any[]) => void>(
             if (callback)
                 callback.apply(this, inputs);
 
-        }]));
+        };
+
+        execStackCallback.hasCallback= callback?true:false;
+
+        fun.apply(this, inputs.concat([execStackCallback]));
+
+
+
 
     };
 
