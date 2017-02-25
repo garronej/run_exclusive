@@ -147,6 +147,10 @@ function __execStack__<T extends (...inputs: any[]) => void>(
             get() {
                 if (!stack) return false;
                 else return stack.isRunning;
+            },
+            set(isRunning){
+                if( !stack ) return;
+                stack.isRunning= isRunning;
             }
         },
         "cancelAllQueuedCalls": {
