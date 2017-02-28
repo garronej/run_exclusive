@@ -1,6 +1,5 @@
 require("colors");
 
-
 let n = process.argv[2];
 
 if (n) {

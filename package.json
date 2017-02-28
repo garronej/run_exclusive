@@ -1,6 +1,6 @@
 {
   "name": "ts-exec-stack",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "A lib to stack function",
   "repository": {
     "type": "git",
@@ -11,7 +11,6 @@
   "scripts": {
     "postinstall": "npm run build",
     "build": "npm run tsc",
-    "generate-async": "node ./src/lib/generateAsync",
     "tsc": "./node_modules/.bin/tsc -p ./tsconfig.json",
     "test": "node ./out/test/index"
   },
