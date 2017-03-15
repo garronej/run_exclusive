@@ -21,9 +21,9 @@
     "@types/node": "^4.0.0",
     "colors": "^1.1.2",
     "trackable-map": "github:garronej/trackable-map",
-    "typescript": "^2.1.4"
+    "typescript": "^2.1.4",
+    "ts-events-extended": "github:garronej/ts-events-extended"
   },
   "devDependencies": {
-    "ts-events-extended": "github:garronej/ts-events-extended"
   }
 }
