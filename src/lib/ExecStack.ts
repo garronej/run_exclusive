@@ -1,53 +1,26 @@
-export interface ExecStack {
-    queuedCalls: Function[];
-    isRunning: boolean;
-    cancelAllQueuedCalls: ()=> number;
-}
+import { TrackableMap } from "trackable-map";
 
-function initExecStack(): ExecStack{
 
-    let queuedCalls= [];
+export class ExecStack {
+    public readonly queuedCalls: Function[]=[];
+    public isRunning: boolean= false;
 
-    return {
-        "queuedCalls": queuedCalls,
-        "isRunning": false,
-        "cancelAllQueuedCalls": ()=> {
+    public cancelAllQueuedCalls(): number {
+        let n: number;
 
-            let n: number;
+        this.queuedCalls.splice(0, n=this.queuedCalls.length);
 
-            queuedCalls.splice(0, n=queuedCalls.length);
+        return n;
 
-            return n;
-            
-        }
-    };
+    }
 
 }
 
 
 type ExecStackByGroup = Record<string, ExecStack>;
 
-let clusters: {
-    ref: Object;
-    execStackByGroup: ExecStackByGroup;
-}[] & { get: (ref: Object) => ExecStackByGroup | undefined }
-    = Object.create(Array.prototype, {
-        "get": {
-            value(ref: Object): ExecStackByGroup | undefined {
 
-                let self = this as typeof clusters;
-
-                for (let cluster of self) {
-                    if (cluster.ref === ref) {
-                        return cluster.execStackByGroup;
-                    }
-                }
-
-                return undefined;
-
-            }
-        }
-    });
+const clusters= new TrackableMap<Object, ExecStackByGroup>();
 
 
 function getStack(clusterRef: Object, group: string | undefined): ExecStack {
@@ -56,14 +29,14 @@ function getStack(clusterRef: Object, group: string | undefined): ExecStack {
 
     if (!execStackByGroup) {
         execStackByGroup = {};
-        clusters.push({ "ref": clusterRef, execStackByGroup });
+        clusters.set(clusterRef, execStackByGroup );
     }
 
     if (group === undefined)
         group = "_" + Object.keys(execStackByGroup).join("");
 
     if (!execStackByGroup[group])
-        execStackByGroup[group] = initExecStack();
+        execStackByGroup[group] = new ExecStack();
 
 
     return execStackByGroup[group];
@@ -93,19 +66,19 @@ function __execStack__<T extends (...inputs: any[]) => void>(
     fun: T
 ): T & ExecStack {
 
-    let stack: ExecStack | undefined = undefined;
+    let execStack: ExecStack | undefined = undefined;
 
     let callee = function (...inputs) {
 
-        if (!stack)
-            stack = getStack(cluster || this, group);
+        if (!execStack)
+            execStack = getStack(cluster || this, group);
 
-        if (stack.isRunning) {
-            stack.queuedCalls.push(() => callee.apply(this, inputs));
+        if (execStack.isRunning) {
+            execStack.queuedCalls.push(() => callee.apply(this, inputs));
             return;
         }
 
-        stack.isRunning = true;
+        execStack.isRunning = true;
 
         let callback = inputs.pop();
         if (typeof (callback) !== "function") {
@@ -117,10 +90,10 @@ function __execStack__<T extends (...inputs: any[]) => void>(
 
         let execStackCallback: any= (...inputs) => {
 
-            stack!.isRunning = false;
+            execStack!.isRunning = false;
 
-            if (stack!.queuedCalls.length)
-                stack!.queuedCalls.shift() !();
+            if (execStack!.queuedCalls.length)
+                execStack!.queuedCalls.shift() !();
 
             if (callback)
                 callback.apply(this, inputs);
@@ -139,24 +112,24 @@ function __execStack__<T extends (...inputs: any[]) => void>(
     Object.defineProperties(callee, {
         "queuedCalls": {
             get() {
-                if (!stack) return [];
-                else return stack.queuedCalls;
+                if (!execStack) return [];
+                else return execStack.queuedCalls;
             }
         },
         "isRunning": {
             get() {
-                if (!stack) return false;
-                else return stack.isRunning;
+                if (!execStack) return false;
+                else return execStack.isRunning;
             },
             set(isRunning){
-                if( !stack ) return;
-                stack.isRunning= isRunning;
+                if( !execStack ) return;
+                execStack.isRunning= isRunning;
             }
         },
         "cancelAllQueuedCalls": {
             value() {
-                if (!stack) return 0;
-                return stack.cancelAllQueuedCalls();
+                if (!execStack) return 0;
+                return execStack.cancelAllQueuedCalls();
             }
         }
     });

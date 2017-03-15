@@ -1,6 +1,6 @@
 {
   "name": "ts-exec-stack",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "description": "A lib to stack function",
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
     "@types/colors": "^1.1.1",
     "@types/node": "^4.0.0",
     "colors": "^1.1.2",
+    "trackable-map": "github:garronej/trackable-map",
     "typescript": "^2.1.4"
   },
   "devDependencies": {
