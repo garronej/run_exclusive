@@ -1,6 +1,5 @@
 import { TrackableMap } from "trackable-map";
 
-
 export class ExecStack {
     public readonly queuedCalls: Function[]=[];
     public isRunning: boolean= false;
@@ -19,9 +18,7 @@ export class ExecStack {
 
 type ExecStackByGroup = Record<string, ExecStack>;
 
-
 const clusters= new TrackableMap<Object, ExecStackByGroup>();
-
 
 function getStack(clusterRef: Object, group: string | undefined): ExecStack {
 
@@ -44,9 +41,9 @@ function getStack(clusterRef: Object, group: string | undefined): ExecStack {
 }
 
 
-export function execStack<T extends (...inputs: any[]) => void>(fun: T): T & ExecStack;
-export function execStack<T extends (...inputs: any[]) => void>(group: string, fun: T): T & ExecStack;
-export function execStack<T extends (...inputs: any[]) => void>(cluster: Object, group: string, fun: T): T & ExecStack;
+export function execStack<T extends (...inputs: any[]) => any>(fun: T): T & ExecStack;
+export function execStack<T extends (...inputs: any[]) => any>(group: string, fun: T): T & ExecStack;
+export function execStack<T extends (...inputs: any[]) => any>(cluster: Object, group: string, fun: T): T & ExecStack;
 export function execStack(...inputs: any[]): any {
 
     switch (inputs.length) {
@@ -68,17 +65,10 @@ function __execStack__<T extends (...inputs: any[]) => void>(
 
     let execStack: ExecStack | undefined = undefined;
 
-    let callee = function (...inputs) {
+    let out: any = function (...inputs) {
 
         if (!execStack)
             execStack = getStack(cluster || this, group);
-
-        if (execStack.isRunning) {
-            execStack.queuedCalls.push(() => callee.apply(this, inputs));
-            return;
-        }
-
-        execStack.isRunning = true;
 
         let callback = inputs.pop();
         if (typeof (callback) !== "function") {
@@ -88,28 +78,43 @@ function __execStack__<T extends (...inputs: any[]) => void>(
             callback = undefined;
         }
 
-        let execStackCallback: any= (...inputs) => {
+        return new Promise<any[]>(resolve => {
 
-            execStack!.isRunning = false;
+            let execStackCallback: any = (...inputs) => {
 
-            if (execStack!.queuedCalls.length)
-                execStack!.queuedCalls.shift() !();
+                execStack!.isRunning = false;
 
-            if (callback)
-                callback.apply(this, inputs);
+                if (execStack!.queuedCalls.length)
+                    execStack!.queuedCalls.shift()!();
 
-        };
+                if (callback)
+                    callback.apply(this, inputs);
 
-        execStackCallback.hasCallback= callback?true:false;
+                resolve(inputs);
 
-        fun.apply(this, inputs.concat([execStackCallback]));
+            };
+
+            execStackCallback.hasCallback = (callback) ? true : false;
+
+            (function callee(...inputs) {
+
+                if (execStack!.isRunning) {
+                    execStack!.queuedCalls.push(() => callee.apply(this, inputs));
+                    return;
+                }
+
+                execStack!.isRunning = true;
 
 
+                fun.apply(this, [...inputs, execStackCallback]);
 
+            }).apply(this, inputs);
 
-    };
+        }).then();
 
-    Object.defineProperties(callee, {
+    }
+
+    Object.defineProperties(out, {
         "queuedCalls": {
             get() {
                 if (!execStack) return [];
@@ -121,9 +126,9 @@ function __execStack__<T extends (...inputs: any[]) => void>(
                 if (!execStack) return false;
                 else return execStack.isRunning;
             },
-            set(isRunning){
-                if( !execStack ) return;
-                execStack.isRunning= isRunning;
+            set(isRunning) {
+                if (!execStack) return;
+                execStack.isRunning = isRunning;
             }
         },
         "cancelAllQueuedCalls": {
@@ -134,6 +139,6 @@ function __execStack__<T extends (...inputs: any[]) => void>(
         }
     });
 
-    return callee as T & ExecStack;
+    return out as T & ExecStack;
 
 }
