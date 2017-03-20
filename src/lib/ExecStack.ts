@@ -110,7 +110,7 @@ function __execStack__<T extends (...inputs: any[]) => void>(
 
             }).apply(this, inputs);
 
-        }).then();
+        });
 
     }
 
