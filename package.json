@@ -1,6 +1,6 @@
 {
   "name": "ts-exec-stack",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "A lib to stack function",
   "repository": {
     "type": "git",

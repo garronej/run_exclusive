@@ -78,7 +78,7 @@ function __execStack__<T extends (...inputs: any[]) => void>(
             callback = undefined;
         }
 
-        return new Promise<any[]>(resolve => {
+        return new Promise<any>(resolve => {
 
             let execStackCallback: any = (...inputs) => {
 
@@ -90,7 +90,11 @@ function __execStack__<T extends (...inputs: any[]) => void>(
                 if (callback)
                     callback.apply(this, inputs);
 
-                resolve(inputs);
+                switch( inputs.length ){
+                    case 0: resolve(); break;
+                    case 1: resolve(inputs[0]); break;
+                    default: resolve(inputs);
+                }
 
             };
 
