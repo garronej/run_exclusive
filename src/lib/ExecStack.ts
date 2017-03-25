@@ -1,5 +1,3 @@
-import { TrackableMap } from "trackable-map";
-
 export class ExecStack {
     public readonly queuedCalls: Function[]=[];
     public isRunning: boolean= false;
@@ -18,7 +16,7 @@ export class ExecStack {
 
 type ExecStackByGroup = Record<string, ExecStack>;
 
-const clusters= new TrackableMap<Object, ExecStackByGroup>();
+const clusters= new Map<Object, ExecStackByGroup>();
 
 function getStack(clusterRef: Object, group: string | undefined): ExecStack {
 

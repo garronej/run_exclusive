@@ -1,29 +1,25 @@
 {
   "name": "ts-exec-stack",
-  "version": "4.1.1",
+  "version": "4.2.0",
   "description": "A lib to stack function",
   "repository": {
     "type": "git",
     "url": "git://github.com/garronej/ts-exec-stack.git"
   },
-  "main": "./out/lib/index.js",
-  "types": "./out/lib/index.d.ts",
+  "main": "./dist/lib/index.js",
+  "types": "./dist/lib/index.d.ts",
   "scripts": {
-    "postinstall": "npm run build",
-    "build": "npm run tsc",
     "tsc": "./node_modules/.bin/tsc -p ./tsconfig.json",
-    "test": "node ./out/test/index"
+    "test": "node ./dist/test/index"
   },
   "author": "Joseph Garrone",
   "license": "MIT",
-  "dependencies": {
+  "dependencies": { },
+  "devDependencies": {
+    "ts-events-extended": "garronej/ts-events-extended",
+    "colors": "^1.1.2",
     "@types/colors": "^1.1.1",
     "@types/node": "^4.0.0",
-    "colors": "^1.1.2",
-    "trackable-map": "github:garronej/trackable-map",
-    "typescript": "^2.1.4",
-    "ts-events-extended": "github:garronej/ts-events-extended"
-  },
-  "devDependencies": {
+    "typescript": "^2.1.4"
   }
 }
