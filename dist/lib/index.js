@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var ExecStack_1 = require("./ExecStack");
-exports.execStack = ExecStack_1.execStack;
-exports.ExecStack = ExecStack_1.ExecStack;
+var ExecQueue_1 = require("./ExecQueue");
+exports.execQueue = ExecQueue_1.execQueue;
+exports.ExecQueue = ExecQueue_1.ExecQueue;
 //# sourceMappingURL=index.js.map

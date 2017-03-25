@@ -1,5 +1,5 @@
 //Import ExecStack to be able to export stacked function
-import { execStack, ExecStack } from "../lib/index";
+import { execQueue, ExecQueue } from "../lib/index";
 import { VoidSyncEvent } from "ts-events-extended";
 
 
@@ -12,7 +12,7 @@ export class MyClass{
     public alphabet= "";
 
 
-    public myMethod= execStack((char: string, callback?: (alphabet: string)=> void): void => {
+    public myMethod= execQueue((char: string, callback?: (alphabet: string)=> void): void => {
 
         setTimeout(()=> {
             this.alphabet+= char;
@@ -45,7 +45,7 @@ export class MyClassProxy{
 
     }
 
-    public myMethod= execStack(function callee(...inputs){
+    public myMethod= execQueue(function callee(...inputs){
 
             let self= this as MyClassProxy;
 

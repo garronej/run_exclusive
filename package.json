@@ -1,10 +1,10 @@
 {
-  "name": "ts-exec-stack",
-  "version": "4.2.0",
-  "description": "A lib to stack function",
+  "name": "ts-exec-queue",
+  "version": "5.0.0",
+  "description": "A lib to define function or set of functions that must run at the time",
   "repository": {
     "type": "git",
-    "url": "git://github.com/garronej/ts-exec-stack.git"
+    "url": "git://github.com/garronej/ts-exec-queue.git"
   },
   "main": "./dist/lib/index.js",
   "types": "./dist/lib/index.d.ts",

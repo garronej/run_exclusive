@@ -1,4 +1,4 @@
-import { execStack } from "../lib/index";
+import { execQueue } from "../lib/index";
 
 
 require("colors");
@@ -9,7 +9,7 @@ class MyClass{
 
     private alphabetStack = "";
 
-    public myMethodStack = execStack((char: string, callback?: (alphabet: string) => void): void => {
+    public myMethodStack = execQueue((char: string, callback?: (alphabet: string) => void): void => {
 
         setTimeout(() => {
             this.alphabetStack += char;

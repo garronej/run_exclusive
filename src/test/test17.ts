@@ -1,5 +1,5 @@
 //Import ExecStack to be able to export stacked function
-import { execStack, ExecStack } from "../lib/index";
+import { execQueue, ExecQueue } from "../lib/index";
 import { SyncEvent } from "ts-events-extended";
 
 
@@ -11,7 +11,7 @@ export class MyClass{
 
     public readonly evtNoCallback= new SyncEvent<string>();
 
-    public myMethod= execStack((message: string, callback?: (alphabet: string)=> void): void => {
+    public myMethod= execQueue((message: string, callback?: (alphabet: string)=> void): void => {
 
         setTimeout(()=> {
 
