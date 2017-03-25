@@ -70,13 +70,11 @@ function __execStack__<T extends (...inputs: any[]) => void>(
         if (!execStack)
             execStack = getStack(cluster || this, group);
 
-        let callback = inputs.pop();
-        if (typeof (callback) !== "function") {
-            if (callback !== undefined)
-                inputs.push(callback);
+        let callback: Function | undefined= undefined;
 
-            callback = undefined;
-        }
+        if( inputs.length && typeof inputs[inputs.length-1] === "function" )
+            callback= inputs.pop();
+
 
         return new Promise<any>(resolve => {
 
