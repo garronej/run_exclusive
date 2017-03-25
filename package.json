@@ -1,7 +1,7 @@
 {
   "name": "ts-exec-queue",
   "version": "5.0.0",
-  "description": "A lib to define function or set of functions that must run at the time",
+  "description": "A lib to prevent concurent call to a function or a group of functions",
   "repository": {
     "type": "git",
     "url": "git://github.com/garronej/ts-exec-queue.git"
