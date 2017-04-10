@@ -1,7 +1,7 @@
 {
   "name": "ts-exec-queue",
-  "version": "5.0.0",
-  "description": "A lib to prevent concurent call to a function or a group of functions",
+  "version": "5.0.1",
+  "description": "A lib to prevent concurrent call to a function or a group of functions",
   "repository": {
     "type": "git",
     "url": "git://github.com/garronej/ts-exec-queue.git"
@@ -14,7 +14,9 @@
   },
   "author": "Joseph Garrone",
   "license": "MIT",
-  "dependencies": { },
+  "dependencies": {
+    "rejection-tracker": "garronej/rejection-tracker"
+  },
   "devDependencies": {
     "ts-events-extended": "garronej/ts-events-extended",
     "colors": "^1.1.2",
