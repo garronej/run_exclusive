@@ -1,30 +1,31 @@
-import { execQueue } from "../lib/index";
+import * as runExclusive from "../lib/runExclusive";
 
 require("colors");
 
+class MyClass {
 
-class MyClass{
+    constructor() { };
 
-    constructor(){};
+    public alphabet = "";
 
-    public alphabet= "";
+    public myMethod = runExclusive.buildMethod(
+        async (char: string): Promise<string> => {
 
+            await new Promise<void>(resolve => setTimeout(resolve, 1000));
 
-    public myMethod= execQueue((char: string, callback?: (alphabet: string)=> void): void => {
+            this.alphabet += char;
 
-        setTimeout(()=> {
-            this.alphabet+= char;
-            callback!(this.alphabet);
-        }, 1000);
+            return this.alphabet;
 
-    });
+        }
+    );
 
 
 }
 
-class MyClassProxy{
+class MyClassProxy {
 
-    constructor(){};
+    constructor() { };
 
     private myClassInst = new MyClass();
 
@@ -34,43 +35,29 @@ class MyClassProxy{
         return this.myClassInst.alphabet;
     }
 
-
     public myMethod: typeof MyClass.prototype.myMethod =
-    (()=>{
+    runExclusive.buildMethod(
+        (...inputs)=>{
 
-        let out= (...inputs)=>{
+            this.callCount++;
 
-                this.callCount++;
-        
-                this.myClassInst.myMethod.apply(this.myClassInst, inputs);
+            return this.myClassInst.myMethod.apply(this.myClassInst, inputs);
 
-        };
-
-
-        Object.defineProperties( out, {
-            "queuedCalls": Object.getOwnPropertyDescriptor(this.myClassInst.myMethod, "queuedCalls"),
-            "isRunning": Object.getOwnPropertyDescriptor(this.myClassInst.myMethod, "isRunning"),
-            "cancelAllQueuedCalls": Object.getOwnPropertyDescriptor(this.myClassInst.myMethod, "cancelAllQueuedCalls")
-        });
-
-        return out as any;
-
-    })();
-
+        }
+    );
 
 
 }
 
 let inst = new MyClassProxy();
 
-
 setTimeout(() => {
 
-    console.assert(inst.myMethod.queuedCalls.length === 3);
+    console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 3);
 
     console.assert(inst.alphabet === "ab");
 
-    inst.myMethod.cancelAllQueuedCalls();
+    runExclusive.cancelAllQueuedCalls(inst.myMethod);
 
     setTimeout(() => {
 
@@ -82,18 +69,16 @@ setTimeout(() => {
 
 }, 2900);
 
-console.assert(inst.myMethod.queuedCalls.length === 0);
-console.assert(inst.myMethod.isRunning === false);
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
+console.assert(runExclusive.isRunning(inst.myMethod) === false );
 inst.myMethod("a");
-console.assert(inst.myMethod.queuedCalls.length === 0);
-console.assert(inst.myMethod.isRunning === true);
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
+console.assert(runExclusive.isRunning(inst.myMethod) === true );
 
 for (let char of ["b", "c", "d", "e", "f"])
-    inst.myMethod(char, alphabet => console.log(`step ${alphabet}`));
+    inst.myMethod(char).then( alphabet => console.log(`step ${alphabet}`));
 
-console.assert(inst.myMethod.queuedCalls.length === 5);
-console.assert(inst.myMethod.isRunning === true);
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 5);
+console.assert(runExclusive.isRunning(inst.myMethod) === true );
 
-
-console.assert(inst.callCount === 6);
-
+console.assert(inst.callCount === 1);

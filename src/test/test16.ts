@@ -1,106 +1,64 @@
-//Import ExecStack to be able to export stacked function
-import { execQueue, ExecQueue } from "../lib/index";
-import { VoidSyncEvent } from "ts-events-extended";
+import * as runExclusive from "../lib/runExclusive";
+import { SyncEvent } from "ts-events-extended";
 
 
 require("colors");
 
+let runCount= 0;
+
 export class MyClass{
 
-    constructor(){};
+    constructor() { };
 
-    public alphabet= "";
+    public myMethod = runExclusive.buildMethod(
+        async (input: string): Promise<[string, number]> => {
 
+            await new Promise<void>(resolve=> setTimeout(resolve, 1000));
 
-    public myMethod= execQueue((char: string, callback?: (alphabet: string)=> void): void => {
+            runCount++;
 
-        setTimeout(()=> {
-            this.alphabet+= char;
-            callback!(this.alphabet);
-        }, 1000);
+            return [input + " 0K", 666];
 
-    });
-
-
-}
-
-export class MyClassProxy{
-
-
-    private myClassInst: MyClass | undefined= undefined;
-
-    public readonly evtCreate= new VoidSyncEvent();
-
-    public get alphabet(): typeof MyClass.prototype.alphabet {
-        if( !this.myClassInst ) return "";
-        else return this.myClassInst.alphabet;
-    }
-
-    constructor(){
-
-        setTimeout(()=> { 
-            this.myClassInst= new MyClass(); 
-            this.evtCreate.post();
-        }, 1000);
-
-    }
-
-    public myMethod= execQueue(function callee(...inputs){
-
-            let self= this as MyClassProxy;
-
-            if (!self.myClassInst) {
-
-                self.evtCreate.attachOnce(() => callee.apply(this, inputs));
-                return;
-
-            }
-
-            self.myClassInst.myMethod.apply(self.myClassInst, inputs);
-
-
-    } as typeof MyClass.prototype.myMethod);
-
-
+        }
+    );
 
 }
 
-let inst = new MyClassProxy();
+let inst= new MyClass();
+
+(async()=> {
+
+    let [ out1, out2 ]= await inst.myMethod("yo")
+
+    console.assert(out1 === "yo 0K" && out2 === 666 );
+
+    inst.myMethod("ya").then(([out1, out2])=> console.assert(out1 == "ya 0K" && out2 === 666));
+
+    inst.myMethod("foo");
+
+    setTimeout(()=> {
+
+        console.assert(runCount === 2);
+
+    }, 1100);
+
+    setTimeout(()=> {
+
+        console.assert(runCount === 3);
+
+        console.log("DONE".green);
+
+    }, 3100);
 
 
-setTimeout(() => {
-
-    console.assert(inst.myMethod.queuedCalls.length === 3);
-
-    console.assert(inst.alphabet === "ab");
-
-    inst.myMethod.cancelAllQueuedCalls();
-
-    setTimeout(() => {
-
-        console.assert(inst.myMethod.isRunning === false);
-
-        console.assert(inst.alphabet === "abc");
-
-        console.log("PASS".green);
-
-    }, 2000);
-
-}, 2900 + 1000);
+})();
 
 
-console.assert(inst.myMethod.queuedCalls.length === 0);
-console.assert(inst.myMethod.isRunning === false);
-inst.myMethod("a");
-console.assert(inst.myMethod.queuedCalls.length === 0);
-console.assert(inst.myMethod.isRunning === true);
 
 
-for (let char of ["b", "c", "d", "e", "f"])
-    inst.myMethod(char, alphabet => console.log(`step ${alphabet}`));
 
-console.assert(inst.myMethod.queuedCalls.length === 5);
-console.assert(inst.myMethod.isRunning === true);
+
+
 
 
 

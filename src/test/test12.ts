@@ -1,66 +1,74 @@
-//Import ExecStack to be able to export stacked function
-import { execQueue, ExecQueue } from "../lib/index";
+import * as runExclusive from "../lib/runExclusive";
 import { VoidSyncEvent } from "ts-events-extended";
 
 
 require("colors");
 
-export class MyClass{
+export class MyClass {
 
-    constructor(){};
+    constructor() { };
 
-    public alphabet= "";
+    public alphabet = "";
 
 
-    public myMethod= execQueue((char: string, callback?: (alphabet: string)=> void): void => {
+    public myMethod = runExclusive.buildMethod(
+        async (char: string): Promise<string> => {
 
-        setTimeout(()=> {
-            this.alphabet+= char;
-            callback!(this.alphabet);
-        }, 1000);
+            await new Promise<void>(resolve => setTimeout(resolve, 1000));
 
-    });
+            this.alphabet += char;
+
+            return this.alphabet;
+
+        }
+    );
 
 
 }
 
-export class MyClassProxy{
+export class MyClassProxy {
 
+    private myClassInst: MyClass | undefined = undefined;
 
-    private myClassInst: MyClass | undefined= undefined;
-
-    public readonly evtCreate= new VoidSyncEvent();
+    public readonly evtCreate = new VoidSyncEvent();
 
     public get alphabet(): typeof MyClass.prototype.alphabet {
-        if( !this.myClassInst ) return "";
+        if (!this.myClassInst) return "";
         else return this.myClassInst.alphabet;
     }
 
-    constructor(){
+    constructor() {
 
-        setTimeout(()=> { 
-            this.myClassInst= new MyClass(); 
+        setTimeout(() => {
+            this.myClassInst = new MyClass();
             this.evtCreate.post();
         }, 1000);
 
     }
 
-    public myMethod= execQueue(function callee(...inputs){
+    public myMethod: typeof MyClass.prototype.myMethod =
+    runExclusive.buildMethod(
+        (...inputs) => {
 
-            let self= this as MyClassProxy;
+            let self = this;
 
-            if (!self.myClassInst) {
+            return new Promise<any>(function callee(resolve, reject) {
 
-                self.evtCreate.attachOnce(() => callee.apply(this, inputs));
-                return;
+                if (!self.myClassInst) {
 
-            }
+                    self.evtCreate.attachOnce(() => callee(resolve, reject));
+                    return;
 
-            self.myClassInst.myMethod.apply(self.myClassInst, inputs);
+                }
 
+                self.myClassInst.myMethod.apply(self.myClassInst, inputs)
+                .then(resolve)
+                .catch(reject);
 
-    } as typeof MyClass.prototype.myMethod);
+            });
 
+        }
+    );
 
 
 }
@@ -70,13 +78,15 @@ let inst = new MyClassProxy();
 
 setTimeout(() => {
 
-    console.assert(inst.myMethod.queuedCalls.length === 3);
+    console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 3);
 
     console.assert(inst.alphabet === "ab");
 
-    inst.myMethod.cancelAllQueuedCalls();
+    runExclusive.cancelAllQueuedCalls(inst.myMethod);
 
     setTimeout(() => {
+
+        console.assert(runExclusive.isRunning(inst.myMethod) === false);
 
         console.assert(inst.alphabet === "abc");
 
@@ -87,18 +97,16 @@ setTimeout(() => {
 }, 2900 + 1000);
 
 
-console.assert(inst.myMethod.queuedCalls.length === 0);
-console.assert(inst.myMethod.isRunning === false);
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
+console.assert(runExclusive.isRunning(inst.myMethod) === false);
 inst.myMethod("a");
-console.assert(inst.myMethod.queuedCalls.length === 0);
-console.assert(inst.myMethod.isRunning === true);
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
+console.assert(runExclusive.isRunning(inst.myMethod) === true);
 
 
 for (let char of ["b", "c", "d", "e", "f"])
-    inst.myMethod(char, alphabet => console.log(`step ${alphabet}`));
-
-console.assert(inst.myMethod.queuedCalls.length === 5);
-console.assert(inst.myMethod.isRunning === true);
+    inst.myMethod(char).then(alphabet => console.log(`step ${alphabet}`));
 
 
-
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 5);
+console.assert(runExclusive.isRunning(inst.myMethod) === true);

@@ -1,4 +1,4 @@
-import { execQueue } from "../lib/index";
+import * as runExclusive from "../lib/runExclusive";
 require("colors");
 
 class MyClass{
@@ -7,31 +7,29 @@ class MyClass{
 
     public alphabet= "";
 
-    public myMethod1= execQueue((char: string, wait: number, callback?: (alphabet: string)=> void): void => {
+    public myMethod1= runExclusive.buildMethod(
+        async (char: string, wait: number): Promise<string> => {
 
-        let safeCallback= callback || function(){};
+            await new Promise<void>(resolve=>setTimeout(resolve,wait));
 
-        setTimeout(()=> {
             this.alphabet+= char;
-            safeCallback(this.alphabet);
-        }, wait);
+
+            return this.alphabet;
 
     });
-
 
     public alphabet2= "";
 
-    public myMethod2= execQueue((char: string, wait: number, callback?: (alphabet: string)=> void): void => {
+    public myMethod2= runExclusive.buildMethod(
+        async (char: string, wait: number): Promise<string> => {
 
-        setTimeout(()=> {
+            await new Promise<void>(resolve=>setTimeout(resolve,wait));
+
             this.alphabet2+= char;
-            callback!(this.alphabet2);
-        }, wait);
+
+            return this.alphabet2;
 
     });
-
-
-
 
 }
 
@@ -40,21 +38,21 @@ let start= Date.now();
 
 let inst= new MyClass();
 
-inst.myMethod1("a", 1000, alphabet=> console.log(alphabet));
-inst.myMethod1("b", 1000, alphabet=> console.log(alphabet));
+inst.myMethod1("a", 1000).then( alphabet=> console.log(alphabet));
+inst.myMethod1("b", 1000).then( alphabet=> console.log(alphabet));
 
 
 let rev= [ "n", "m", "l", "k", "j", "i", "h", "g", "f", "e", "d", "c", "b" ];
 let wait= 500;
 
 for( let char of rev)
-    inst.myMethod2(char, wait, alphabet => console.log(alphabet.blue));
-inst.myMethod2("a", wait, function() {
+    inst.myMethod2(char, wait ).then( alphabet => console.log(alphabet.blue));
+inst.myMethod2("a", wait ).then( function() {
 
     let duration= Date.now() - start;
 
     //cSpell: disable
-    console.assert(this.alphabet2 === "nmlkjihgfedcba" );
+    console.assert(inst.alphabet2 === "nmlkjihgfedcba" );
     //cSpell: enable
 
     let expectedDuration= (rev.length+1)*500;
@@ -71,8 +69,8 @@ inst.myMethod2("a", wait, function() {
 
 });
 
-inst.myMethod1("c", 1000, alphabet=> console.log(alphabet));
-inst.myMethod1("d", 1000, ()=>{
+inst.myMethod1("c", 1000).then( alphabet=> console.log(alphabet));
+inst.myMethod1("d", 1000).then( ()=>{
 
     let duration= Date.now() - start;
 

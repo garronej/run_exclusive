@@ -1,4 +1,5 @@
-import { execQueue } from "../lib/index";
+import * as runExclusive from "../lib/runExclusive";
+
 require("colors");
 
 
@@ -8,28 +9,31 @@ class MyClass{
 
     public alphabet= "";
 
+    public myMethod1= runExclusive.buildMethod("GROUP", 
+        async (char: string, wait: number): Promise<string> => {
 
-    public myMethod1= execQueue("GROUP", (char: string, wait: number, callback?: (alphabet: string)=> void): void => {
+            await new Promise<void>(resolve => setTimeout(resolve, wait));
 
-        setTimeout(()=> {
-            this.alphabet+= char;
-            callback!(this.alphabet);
-        }, wait);
+            this.alphabet += char;
 
-    });
+            return this.alphabet;
 
-    public alphabet2= "";
+        }
+    );
 
-    public myMethod2= execQueue((char: string, wait: number, callback?: (alphabet: string)=> void): void => {
+    public alphabet2 = "";
 
-        let safeCallback= callback || function(){};
+    public myMethod2 = runExclusive.buildMethod(
+        async (char: string, wait: number): Promise<string> => {
 
-        setTimeout(()=> {
-            this.alphabet2+= char;
-            safeCallback(this.alphabet2);
-        }, wait);
+            await new Promise<void>(resolve => setTimeout(resolve, wait));
 
-    });
+            this.alphabet2 += char;
+
+            return this.alphabet2;
+
+        }
+    );
 
 
 
@@ -37,56 +41,57 @@ class MyClass{
 }
 
 
-let start= Date.now();
+let start = Date.now();
 
-let inst= new MyClass();
+let inst = new MyClass();
 
-inst.myMethod1("a", 1000, alphabet=> console.log(alphabet));
-inst.myMethod1("b", 1000, alphabet=> console.log(alphabet));
+inst.myMethod1("a", 1000).then( alphabet => console.log(alphabet) );
+inst.myMethod1("b", 1000).then( alphabet => console.log(alphabet) );
 
 
-let rev= [ "n", "m", "l", "k", "j", "i", "h", "g", "f", "e", "d", "c", "b" ];
-let wait= 500;
+let rev = ["n", "m", "l", "k", "j", "i", "h", "g", "f", "e", "d", "c", "b"];
+let wait = 500;
 
-for( let char of rev)
-    inst.myMethod2(char, wait, alphabet => console.log(alphabet.blue));
-inst.myMethod2("a", wait, function() {
+for (let char of rev)
+    inst.myMethod2(char, wait).then( alphabet => console.log(alphabet.blue));
 
-    let duration= Date.now() - start;
+inst.myMethod2("a", wait ).then( function () {
+
+    let duration = Date.now() - start;
 
     //cSpell: disable
-    console.assert(this.alphabet2 === "nmlkjihgfedcba" );
+    console.assert(inst.alphabet2 === "nmlkjihgfedcba");
     //cSpell: enable
 
-    let expectedDuration= (rev.length+1)*wait;
+    let expectedDuration = (rev.length + 1) * wait;
 
     console.log("expectedDuration: ", expectedDuration);
     console.log("duration: ", duration);
 
-    console.assert( Math.abs(duration - expectedDuration) < 300 );
-    console.assert( duration - expectedDuration >= 0 );
+    console.assert(Math.abs(duration - expectedDuration) < 300);
+    console.assert(duration - expectedDuration >= 0);
 
     console.log("PASS".green);
 
 
 });
 
-inst.myMethod1("c", 1000, alphabet=> console.log(alphabet));
-inst.myMethod1("d", 1000, ()=>{
+inst.myMethod1("c", 1000).then( alphabet => console.log(alphabet));
+inst.myMethod1("d", 1000).then( () => {
 
-    let duration= Date.now() - start;
+    let duration = Date.now() - start;
 
     //cSpell: disable
-    console.assert(inst.alphabet === "abcd" );
+    console.assert(inst.alphabet === "abcd");
     //cSpell: enable
 
-    let expectedDuration= 1000*4;
+    let expectedDuration = 1000 * 4;
 
     console.log("expectedDuration: ", expectedDuration);
     console.log("duration: ", duration);
 
-    console.assert( Math.abs(duration - expectedDuration) < 300 );
-    console.assert( duration - expectedDuration >= 0 );
+    console.assert(Math.abs(duration - expectedDuration) < 300);
+    console.assert(duration - expectedDuration >= 0);
 
 
 });

@@ -1,39 +1,40 @@
-import { execQueue } from "../lib/index";
+import * as runExclusive from "../lib/runExclusive";
 
 require("colors");
 
 
-class MyClass{
+class MyClass {
 
-    constructor(){};
+    constructor() { };
 
-    public alphabet= "";
+    public alphabet = "";
 
+    public myMethod = runExclusive.buildMethod(
+        async (char: string): Promise<string> => {
 
-    public myMethod= execQueue((char: string, callback?: (alphabet: string)=> void): void => {
+            await new Promise<void>(resolve => setTimeout(resolve, 1000));
 
-        setTimeout(()=> {
-            this.alphabet+= char;
-            callback!(this.alphabet);
-        }, 1000);
+            this.alphabet += char;
 
-    });
+            return this.alphabet;
+
+        }
+    );
 
 
 }
 
-let inst= new MyClass();
+let inst = new MyClass();
 
+setTimeout(() => {
 
-setTimeout(()=>{
-
-    console.assert(inst.myMethod.queuedCalls.length === 3);
+    console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 3)
 
     console.assert(inst.alphabet === "ab");
 
-    inst.myMethod.cancelAllQueuedCalls();
+    runExclusive.cancelAllQueuedCalls(inst.myMethod);
 
-    setTimeout(()=>{
+    setTimeout(() => {
 
         console.assert(inst.alphabet === "abc");
 
@@ -43,9 +44,6 @@ setTimeout(()=>{
 
 }, 2900);
 
-for( let char of [ "a", "b", "c", "d", "e", "f" ])
-    inst.myMethod(char, alphabet=>console.log(`step ${alphabet}`));
-
-
-
+for (let char of ["a", "b", "c", "d", "e", "f"])
+    inst.myMethod(char).then(alphabet => console.log(`step ${alphabet}`));
 

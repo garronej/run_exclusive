@@ -1,4 +1,4 @@
-import { execQueue } from "../lib/index";
+import * as runExclusive from "../lib/runExclusive";
 
 
 require("colors");
@@ -9,42 +9,45 @@ class MyClass{
 
     private alphabetStack= "";
 
+    public myMethodUpperCase = runExclusive.buildMethod("ALPHABET",
+        async (char: string ): Promise<string> => {
 
-    public myMethodUpperCase= execQueue("ALPHABET", (char: string, callback?: (alphabet: string)=> void): void => {
+            await new Promise<void>(resolve=> setTimeout(resolve, Math.random()*1000));
 
-        setTimeout(()=> {
-            this.alphabetStack+= char.toUpperCase();
-            callback!(this.alphabetStack);
-        }, Math.random()*1000);
+            this.alphabetStack += char.toUpperCase();
 
-    });
+            return this.alphabetStack;
 
+        }
+    );
 
-    public myMethod= execQueue("ALPHABET", (char: string, callback?: (alphabet: string)=> void): void => {
+    public myMethod = runExclusive.buildMethod("ALPHABET",
+        async (char: string ): Promise<string> => {
 
-        setTimeout(()=> {
-            this.alphabetStack+= char;
-            callback!(this.alphabetStack);
-        }, Math.random()*1000);
+            await new Promise<void>(resolve=> setTimeout(resolve, Math.random()*1000));
 
-    });
+            this.alphabetStack += char;
+
+            return this.alphabetStack;
+
+        }
+    );
 
 
 }
 
-let inst= new MyClass();
-
+let inst = new MyClass();
 
 inst.myMethod("a");
 
-for( let char of [ "b", "c", "d", "e", "f" ])
-    inst.myMethodUpperCase(char, alphabet=>console.log(`step ${alphabet}`));
+for (let char of ["b", "c", "d", "e", "f"])
+    inst.myMethodUpperCase(char).then( alphabet => console.log(`step ${alphabet}`));
 
 
-for( let char of [ "g", "h", "i" ])
-    inst.myMethod(char, alphabet=>console.log(`step ${alphabet}`));
+for (let char of ["g", "h", "i"])
+    inst.myMethod(char).then( alphabet => console.log(`step ${alphabet}`));
 
-inst.myMethod("j", alphabet => {
+inst.myMethod("j").then( alphabet => {
 
     console.log(`completed ${alphabet}`)
 

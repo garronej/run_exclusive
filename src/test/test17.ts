@@ -1,58 +1,57 @@
 //Import ExecStack to be able to export stacked function
-import { execQueue, ExecQueue } from "../lib/index";
-import { SyncEvent } from "ts-events-extended";
 
+import * as runExclusive from "../lib/runExclusive";
+import { SyncEvent } from "ts-events-extended";
 
 require("colors");
 
-export class MyClass{
+let runCount = 0;
 
-    constructor(){};
+export class MyClass {
 
-    public readonly evtNoCallback= new SyncEvent<string>();
+    constructor() { };
 
-    public myMethod= execQueue((message: string, callback?: (alphabet: string)=> void): void => {
+    public myMethod = runExclusive.buildMethod(
+        async (input: number): Promise<string> => {
 
-        setTimeout(()=> {
+            await new Promise<void>(resolve => setTimeout(resolve, 1000));
 
-            if( !(callback as any).hasCallback )
-                this.evtNoCallback.post(message);
+            runCount++;
+
+            return "input: " + input.toString();
 
 
-            callback!(message)
-        }, 1000);
-
-    });
-
+        }
+    );
 
 }
 
-
 let inst = new MyClass();
 
-let success= false
+(async () => {
 
-inst.evtNoCallback.attach(message=>{
+    let out = await inst.myMethod(111);
 
-    console.assert(message === "noCallback");
+    console.log(out);
+    console.log(out === "input: 111");
 
-    success= true;
+    inst.myMethod(222).then(out => console.log(out === "input: 222"));
 
-});
+    inst.myMethod(333);
 
-inst.myMethod("callback", message => console.assert("callback"===message));
-inst.myMethod("noCallback");
+    setTimeout(() => {
 
-setTimeout(()=>{
+        console.assert(runCount === 2);
 
-    console.assert(success);
+    }, 1100);
 
-    console.log("DONE".green);
+    setTimeout(() => {
+
+        console.assert(runCount === 3);
+
+        console.log("DONE".green);
+
+    }, 3100);
 
 
-},2500);
-
-
-
-
-
+})();

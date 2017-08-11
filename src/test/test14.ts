@@ -1,37 +1,37 @@
-import { execQueue } from "../lib/index";
-
+import * as runExclusive from "../lib/runExclusive";
 
 require("colors");
 
-class MyClass{
+class MyClass {
 
-    constructor(){};
+    constructor() { };
 
-    public alphabet= "";
+    public alphabet = "";
 
+    public myMethod = runExclusive.buildMethod(
+        async (char: string): Promise<string> => {
 
-    public myMethod= execQueue((char: string, callback?: (alphabet: string)=> void): void => {
+            await new Promise<void>(resolve => setTimeout(resolve, 1000));
 
-        setTimeout(()=> {
-            this.alphabet+= char;
-            callback!(this.alphabet);
-        }, 1000);
+            this.alphabet += char;
 
-    });
+            return this.alphabet;
+
+        }
+    );
 
 
 }
 
-let inst= new MyClass();
+let inst = new MyClass();
 
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
+console.assert(runExclusive.isRunning(inst.myMethod) === false);
 
-console.assert(inst.myMethod.queuedCalls.length=== 0);
-console.assert(inst.myMethod.isRunning === false);
+inst.myMethod("a").then(() => {
 
-inst.myMethod("a", ()=>{
-
-    console.assert(inst.myMethod.queuedCalls.length === 0);
-    console.assert(inst.myMethod.isRunning === true);
+    console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
+    console.assert(runExclusive.isRunning(inst.myMethod) === true);
 
     console.log("PASS".green);
 

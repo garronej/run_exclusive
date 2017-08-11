@@ -1,22 +1,27 @@
-import { execQueue } from "../lib/index";
-
+import * as runExclusive from "../lib/runExclusive";
 
 require("colors");
 
-class MyClass{
+class MyClass {
 
-    constructor(){};
+    constructor() { };
 
     private alphabetStack = "";
 
-    public myMethodStack = execQueue((char: string, callback?: (alphabet: string) => void): void => {
+    public myMethodStack = runExclusive.buildMethod(
+        (char: string): Promise<string> => {
 
-        setTimeout(() => {
-            this.alphabetStack += char;
-            callback!(this.alphabetStack);
-        }, Math.random() * 1000);
+            return new Promise<string>(resolve => {
 
-    });
+                setTimeout(() => {
+                    this.alphabetStack += char;
+                    resolve(this.alphabetStack);
+                }, Math.random() * 1000);
+
+            });
+
+        }
+    );
 
 
 }
@@ -24,13 +29,13 @@ class MyClass{
 let inst = new MyClass();
 
 for (let char of ["a", "b", "c", "d", "e", "f"])
-    inst.myMethodStack(char, alphabet => console.log(`step ${alphabet}`));
+    inst.myMethodStack(char).then( alphabet => console.log(`step ${alphabet}`) );
 
 
 for (let char of ["g", "h", "i"])
     inst.myMethodStack(char);
 
-inst.myMethodStack("j", alphabet => {
+inst.myMethodStack("j").then( alphabet => {
 
     console.log(`completed ${alphabet}`);
 
@@ -41,4 +46,3 @@ inst.myMethodStack("j", alphabet => {
     console.log("PASS".green);
 
 });
-

@@ -1,10 +1,10 @@
 {
-  "name": "ts-exec-queue",
-  "version": "5.0.1",
+  "name": "run-exclusive",
+  "version": "1.0.0",
   "description": "A lib to prevent concurrent call to a function or a group of functions",
   "repository": {
     "type": "git",
-    "url": "git://github.com/garronej/ts-exec-queue.git"
+    "url": "git://github.com/garronej/run-exclusive.git"
   },
   "main": "./dist/lib/index.js",
   "types": "./dist/lib/index.d.ts",
@@ -14,14 +14,12 @@
   },
   "author": "Joseph Garrone",
   "license": "MIT",
-  "dependencies": {
-    "rejection-tracker": "garronej/rejection-tracker"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "ts-events-extended": "garronej/ts-events-extended",
-    "colors": "^1.1.2",
     "@types/colors": "^1.1.1",
     "@types/node": "^4.0.0",
-    "typescript": "^2.1.4"
+    "colors": "^1.1.2",
+    "ts-events-extended": "garronej/ts-events-extended",
+    "typescript": "^2.4.2"
   }
 }
