@@ -6,8 +6,8 @@
     "type": "git",
     "url": "git://github.com/garronej/run-exclusive.git"
   },
-  "main": "./dist/lib/index.js",
-  "types": "./dist/lib/index.d.ts",
+  "main": "./dist/lib/runExclusive.js",
+  "types": "./dist/lib/runExclusive.d.ts",
   "scripts": {
     "tsc": "./node_modules/.bin/tsc -p ./tsconfig.json",
     "test": "node ./dist/test/index"
