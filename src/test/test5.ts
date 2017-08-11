@@ -8,7 +8,9 @@ class MyClass {
 
     public alphabet = "";
 
-    public myMethod = runExclusive.buildMethod("ALPHABET",
+    public static readonly groupRef = runExclusive.createGroupRef();
+
+    public myMethod = runExclusive.buildMethod(MyClass.groupRef,
         async (char: string, wait: number): Promise<string> => {
 
             await new Promise<void>(resolve => setTimeout(resolve, wait));
@@ -56,7 +58,7 @@ inst1.myMethod.call(MyClass, "d", 1000).then(() => {
     console.assert(inst1.alphabet === "abcd");
     //cSpell: enable
 
-    let expectedDuration = 1000 * 4 + (rev.length + 1) * 500;
+    let expectedDuration = 1000 * 4 + (rev.length + 1) * wait;
 
     console.log("expectedDuration: ", expectedDuration);
     console.log("duration: ", duration);

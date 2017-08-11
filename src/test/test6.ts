@@ -1,13 +1,15 @@
 import * as runExclusive from "../lib/runExclusive";
 require("colors");
 
+const groupRefAlphabet= runExclusive.createGroupRef();
+
 class MyClass1 {
 
     constructor() { };
 
     public alphabet = "";
 
-    public myMethod = runExclusive.build("test6_ALPHABET",
+    public myMethod = runExclusive.build(groupRefAlphabet,
         async (char: string, wait: number): Promise<string> => {
 
             await new Promise<void>(resolve => setTimeout(resolve, wait));
@@ -26,7 +28,7 @@ class MyClass2 {
 
     public alphabet = "";
 
-    public myMethod = runExclusive.build("test6_ALPHABET",
+    public myMethod = runExclusive.build(groupRefAlphabet,
         async (char: string, wait: number): Promise<string> => {
 
             await new Promise<void>(resolve => setTimeout(resolve, wait));

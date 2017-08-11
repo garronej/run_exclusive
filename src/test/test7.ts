@@ -9,7 +9,7 @@ class MyClass{
 
     public alphabet= "";
 
-    public myMethod1= runExclusive.buildMethod("GROUP", 
+    public myMethod1= runExclusive.buildMethod(runExclusive.createGroupRef(), 
         async (char: string, wait: number): Promise<string> => {
 
             await new Promise<void>(resolve => setTimeout(resolve, wait));

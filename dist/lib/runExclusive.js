@@ -14,73 +14,80 @@ var ExecQueue = (function () {
 }());
 exports.ExecQueue = ExecQueue;
 var clusters = new Map();
-var generateUniqGroup = (function () {
-    var counter = 0;
-    return function () { return "zFw3#Te0x-@sR=xElM%dEfKln===" + counter++; };
-})();
-function getOrCreateExecQueue(clusterRef, group) {
+function getOrCreateExecQueue(clusterRef, groupRef) {
     var execQueueByGroup = clusters.get(clusterRef);
     if (!execQueueByGroup) {
-        execQueueByGroup = {};
+        execQueueByGroup = new Map();
         clusters.set(clusterRef, execQueueByGroup);
     }
-    if (!execQueueByGroup[group])
-        execQueueByGroup[group] = new ExecQueue();
-    return execQueueByGroup[group];
+    var execQueue = execQueueByGroup.get(groupRef);
+    if (!execQueue) {
+        execQueue = new ExecQueue();
+        execQueueByGroup.set(groupRef, execQueue);
+    }
+    return execQueue;
 }
-var clusterRefGlobal = ["GLOBAL CLUSTER REF"];
+function createGroupRef() {
+    return [];
+}
+exports.createGroupRef = createGroupRef;
 function buildMethod() {
     var inputs = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         inputs[_i] = arguments[_i];
     }
     switch (inputs.length) {
-        case 1: return _build_(undefined, undefined, inputs[0]);
+        case 1: return _build_(undefined, createGroupRef(), inputs[0]);
         case 2: return _build_(undefined, inputs[0], inputs[1]);
     }
 }
 exports.buildMethod = buildMethod;
+var clusterRefGlobal = ["GLOBAL_CLUSTER_REF"];
 function build() {
     var inputs = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         inputs[_i] = arguments[_i];
     }
     switch (inputs.length) {
-        case 1: return _build_(clusterRefGlobal, undefined, inputs[0]);
+        case 1: return _build_(clusterRefGlobal, createGroupRef(), inputs[0]);
         case 2: return _build_(clusterRefGlobal, inputs[0], inputs[1]);
     }
 }
 exports.build = build;
-var execQueueRefByFunction = new Map();
 function getQueuedCallCount(runExclusiveFunction, clusterRef) {
-    return getExecQueue(runExclusiveFunction, clusterRef).queuedCalls.length;
+    var execQueue = getExecQueueFromFunction(runExclusiveFunction, clusterRef);
+    return execQueue ? execQueue.queuedCalls.length : 0;
 }
 exports.getQueuedCallCount = getQueuedCallCount;
 function cancelAllQueuedCalls(runExclusiveFunction, clusterRef) {
-    return getExecQueue(runExclusiveFunction, clusterRef).cancelAllQueuedCalls();
+    var execQueue = getExecQueueFromFunction(runExclusiveFunction, clusterRef);
+    return execQueue ? execQueue.cancelAllQueuedCalls() : 0;
 }
 exports.cancelAllQueuedCalls = cancelAllQueuedCalls;
 function isRunning(runExclusiveFunction, clusterRef) {
-    return getExecQueue(runExclusiveFunction, clusterRef).isRunning;
+    var execQueue = getExecQueueFromFunction(runExclusiveFunction, clusterRef);
+    return execQueue ? execQueue.isRunning : false;
 }
 exports.isRunning = isRunning;
-function getExecQueue(runExclusiveFunction, clusterRef) {
+var execQueueRefByFunction = new Map();
+function getExecQueueFromFunction(runExclusiveFunction, clusterRef) {
     if (!execQueueRefByFunction.has(runExclusiveFunction))
         throw new Error("This is not a run exclusive function");
-    var _a = execQueueRefByFunction.get(runExclusiveFunction), clusterRefLastCall = _a.clusterRefLastCall, group = _a.group;
-    if (clusterRef === undefined)
+    var _a = execQueueRefByFunction.get(runExclusiveFunction), clusterRefLastCall = _a.clusterRefLastCall, groupRef = _a.groupRef;
+    if (clusterRef === undefined) {
+        if (clusterRefLastCall === undefined)
+            return undefined;
         clusterRef = clusterRefLastCall;
+    }
     var execQueueByGroup = clusters.get(clusterRef);
     if (!execQueueByGroup)
-        return new ExecQueue();
-    var execQueue = execQueueByGroup[group];
+        return undefined;
+    var execQueue = execQueueByGroup.get(groupRef);
     if (!execQueue)
-        return new ExecQueue();
+        return undefined;
     return execQueue;
 }
-function _build_(clusterRef, group, fun) {
-    if (group === undefined)
-        group = generateUniqGroup();
+function _build_(clusterRef, groupRef, fun) {
     var out = (function () {
         var _this = this;
         var inputs = [];
@@ -89,11 +96,11 @@ function _build_(clusterRef, group, fun) {
         }
         var execQueue;
         if (clusterRef === undefined) {
-            execQueue = getOrCreateExecQueue(this, group);
+            execQueue = getOrCreateExecQueue(this, groupRef);
             execQueueRefByFunction.get(out).clusterRefLastCall = this;
         }
         else {
-            execQueue = getOrCreateExecQueue(clusterRef, group);
+            execQueue = getOrCreateExecQueue(clusterRef, groupRef);
         }
         return new Promise(function (resolve, reject) {
             var onComplete = function (result) {
@@ -127,20 +134,9 @@ function _build_(clusterRef, group, fun) {
             }).apply(_this, inputs);
         });
     });
-    if (clusterRef === undefined) {
-        var tmpClusterRef = ["TMP BEFORE FIRST CALL"];
-        execQueueRefByFunction.set(out, {
-            "clusterRefLastCall": tmpClusterRef,
-            group: group
-        });
-        getOrCreateExecQueue(tmpClusterRef, group);
-    }
-    else {
-        execQueueRefByFunction.set(out, {
-            "clusterRefLastCall": clusterRef,
-            group: group
-        });
-        getOrCreateExecQueue(clusterRef, group);
-    }
+    execQueueRefByFunction.set(out, {
+        "clusterRefLastCall": (clusterRef === undefined) ? undefined : clusterRef,
+        groupRef: groupRef
+    });
     return out;
 }

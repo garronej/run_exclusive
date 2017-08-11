@@ -3,13 +3,16 @@ import * as runExclusive from "../lib/runExclusive";
 
 require("colors");
 
+
 class MyClass{
 
     constructor(){};
 
+    private readonly groupRefAlphabet= runExclusive.createGroupRef();
+
     private alphabetStack= "";
 
-    public myMethodUpperCase = runExclusive.buildMethod("ALPHABET",
+    public myMethodUpperCase = runExclusive.buildMethod(this.groupRefAlphabet,
         async (char: string ): Promise<string> => {
 
             await new Promise<void>(resolve=> setTimeout(resolve, Math.random()*1000));
@@ -21,7 +24,7 @@ class MyClass{
         }
     );
 
-    public myMethod = runExclusive.buildMethod("ALPHABET",
+    public myMethod = runExclusive.buildMethod(this.groupRefAlphabet,
         async (char: string ): Promise<string> => {
 
             await new Promise<void>(resolve=> setTimeout(resolve, Math.random()*1000));

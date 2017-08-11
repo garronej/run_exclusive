@@ -13,64 +13,63 @@ export class ExecQueue {
 
 }
 
-type ExecQueueByGroup = Record<string, ExecQueue>;
 
-export type ClusterRef= Object | string | number;
+export type GroupRef = never[];
+export type ClusterRef= Object | string;
 
-const clusters = new Map<ClusterRef, ExecQueueByGroup>();
+const clusters = new Map<ClusterRef, Map<GroupRef,ExecQueue>>();
 
-const generateUniqGroup = (() => {
-
-    let counter = 0;
-
-    return (): string => `zFw3#Te0x-@sR=xElM%dEfKln===${counter++}`;
-
-})();
-
-
-function getOrCreateExecQueue(clusterRef: ClusterRef, group: string): ExecQueue {
+function getOrCreateExecQueue(
+    clusterRef: ClusterRef, 
+    groupRef: GroupRef
+): ExecQueue {
 
     let execQueueByGroup = clusters.get(clusterRef);
 
     if (!execQueueByGroup) {
-        execQueueByGroup = {};
+        execQueueByGroup = new Map();
         clusters.set(clusterRef, execQueueByGroup);
     }
 
-    if (!execQueueByGroup[group])
-        execQueueByGroup[group] = new ExecQueue();
+    let execQueue= execQueueByGroup.get(groupRef);
 
-    return execQueueByGroup[group];
+    if (!execQueue){
+        execQueue= new ExecQueue();
+        execQueueByGroup.set(groupRef, execQueue);
+    }
+
+    return execQueue;
 
 }
 
-const clusterRefGlobal = [ "GLOBAL CLUSTER REF" ];
+export function createGroupRef(): GroupRef {
+    return [];
+}
+
 
 export function buildMethod<T extends (...input: any[]) => Promise<any>>(fun: T): T;
-export function buildMethod<T extends (...input: any[]) => Promise<any>>(group: string, fun: T): T;
+export function buildMethod<T extends (...input: any[]) => Promise<any>>(groupRef: GroupRef, fun: T): T;
 export function buildMethod(...inputs: any[]): any {
 
     switch (inputs.length) {
-        case 1: return _build_(undefined, undefined, inputs[0]);
+        case 1: return _build_(undefined, createGroupRef(), inputs[0]);
         case 2: return _build_(undefined, inputs[0], inputs[1]);
     }
 
 }
 
+const clusterRefGlobal = [ "GLOBAL_CLUSTER_REF" ];
+
 export function build<T extends (...input: any[]) => Promise<any>>(fun: T): T;
-export function build<T extends (...input: any[]) => Promise<any>>(group: string, fun: T): T;
+export function build<T extends (...input: any[]) => Promise<any>>(groupRef: GroupRef, fun: T): T;
 export function build(...inputs: any[]): any {
 
     switch (inputs.length) {
-        case 1: return _build_(clusterRefGlobal, undefined, inputs[0]);
+        case 1: return _build_(clusterRefGlobal, createGroupRef(), inputs[0]);
         case 2: return _build_(clusterRefGlobal, inputs[0], inputs[1]);
     }
 
 }
-
-
-
-const execQueueRefByFunction = new Map<Function, { clusterRefLastCall: ClusterRef, group: string; }>();
 
 
 export function getQueuedCallCount(
@@ -78,7 +77,9 @@ export function getQueuedCallCount(
     clusterRef?: ClusterRef
 ): number {
 
-    return getExecQueue(runExclusiveFunction, clusterRef).queuedCalls.length;
+    let execQueue= getExecQueueFromFunction(runExclusiveFunction, clusterRef);
+
+    return execQueue?execQueue.queuedCalls.length:0;
 
 }
 
@@ -87,7 +88,9 @@ export function cancelAllQueuedCalls(
     clusterRef?: ClusterRef
 ): number {
 
-    return getExecQueue(runExclusiveFunction, clusterRef).cancelAllQueuedCalls();
+    let execQueue= getExecQueueFromFunction(runExclusiveFunction, clusterRef);
+
+    return execQueue?execQueue.cancelAllQueuedCalls():0;
 
 }
 
@@ -96,29 +99,39 @@ export function isRunning(
     clusterRef?: ClusterRef
 ): boolean {
 
-    return getExecQueue(runExclusiveFunction, clusterRef).isRunning;
+    let execQueue= getExecQueueFromFunction(runExclusiveFunction, clusterRef);
+
+    return execQueue?execQueue.isRunning:false;
 
 }
 
-function getExecQueue(
+const execQueueRefByFunction = new Map<Function, { clusterRefLastCall: ClusterRef | undefined, groupRef: GroupRef; }>();
+
+function getExecQueueFromFunction(
     runExclusiveFunction: Function, 
     clusterRef?: ClusterRef
-): ExecQueue {
+): ExecQueue | undefined {
 
     if (!execQueueRefByFunction.has(runExclusiveFunction))
         throw new Error("This is not a run exclusive function");
 
-    let { clusterRefLastCall, group } = execQueueRefByFunction.get(runExclusiveFunction)!;
+    let { clusterRefLastCall, groupRef } = execQueueRefByFunction.get(runExclusiveFunction)!;
 
-    if (clusterRef === undefined) clusterRef = clusterRefLastCall;
+    if (clusterRef === undefined){
+        
+        if( clusterRefLastCall === undefined ) return undefined;
+
+        clusterRef = clusterRefLastCall;
+
+    }
 
     let execQueueByGroup= clusters.get(clusterRef);
 
-    if( !execQueueByGroup ) return new ExecQueue();
+    if( !execQueueByGroup ) return undefined;
 
-    let execQueue= execQueueByGroup[group];
+    let execQueue= execQueueByGroup.get(groupRef);
 
-    if( !execQueue ) return new ExecQueue();
+    if( !execQueue ) return undefined;
 
     return execQueue;
 
@@ -127,11 +140,9 @@ function getExecQueue(
 
 function _build_<T extends (...inputs: any[]) => Promise<any>>(
     clusterRef: ClusterRef | undefined,
-    group: string | undefined,
+    groupRef: GroupRef,
     fun: T
 ): T {
-
-    if( group === undefined ) group = generateUniqGroup();
 
     let out = (function (...inputs) {
 
@@ -139,13 +150,13 @@ function _build_<T extends (...inputs: any[]) => Promise<any>>(
 
         if (clusterRef === undefined) {
 
-            execQueue = getOrCreateExecQueue(this, group!);
+            execQueue = getOrCreateExecQueue(this, groupRef);
 
             execQueueRefByFunction.get(out)!.clusterRefLastCall = this;
 
         }else{
 
-            execQueue = getOrCreateExecQueue(clusterRef, group!);
+            execQueue = getOrCreateExecQueue(clusterRef, groupRef);
 
         }
 
@@ -190,27 +201,10 @@ function _build_<T extends (...inputs: any[]) => Promise<any>>(
 
     }) as T;
 
-    if( clusterRef === undefined ){
-
-        let tmpClusterRef= [ "TMP BEFORE FIRST CALL" ];
-
-        execQueueRefByFunction.set(out, {
-            "clusterRefLastCall": tmpClusterRef,
-            group
-        });
-
-        getOrCreateExecQueue(tmpClusterRef, group);
-
-    }else{
-
-        execQueueRefByFunction.set(out, {
-            "clusterRefLastCall": clusterRef,
-            group
-        });
-
-        getOrCreateExecQueue(clusterRef, group);
-
-    }
+    execQueueRefByFunction.set(out, {
+        "clusterRefLastCall": (clusterRef === undefined) ? undefined : clusterRef,
+        groupRef
+    });
 
     return out;
 
