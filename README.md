@@ -113,7 +113,7 @@ class Student {
     public spell= runExclusive.buildMethod(
        async (letter: string) => {
 
-            await new Promise<void>(resolve=> setTimeout(resolve, 100));
+            await new Promise<void>(resolve=> setTimeout(resolve, 1000));
 
             this.alphabet+=letter.toLowerCase();
 
