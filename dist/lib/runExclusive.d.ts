@@ -13,3 +13,7 @@ export declare function build<T extends (...input: any[]) => Promise<any>>(group
 export declare function getQueuedCallCount(runExclusiveFunction: Function, clusterRef?: ClusterRef): number;
 export declare function cancelAllQueuedCalls(runExclusiveFunction: Function, clusterRef?: ClusterRef): number;
 export declare function isRunning(runExclusiveFunction: Function, clusterRef?: ClusterRef): boolean;
+export declare function buildMethodCb<T extends (...input: any[]) => any>(fun: T): T;
+export declare function buildMethodCb<T extends (...input: any[]) => any>(groupRef: GroupRef, fun: T): T;
+export declare function buildCb<T extends (...input: any[]) => any>(fun: T): T;
+export declare function buildCb<T extends (...input: any[]) => any>(groupRef: GroupRef, fun: T): T;

@@ -1,4 +1,24 @@
 "use strict";
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (this && this.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var ExecQueue = (function () {
     function ExecQueue() {
@@ -31,26 +51,26 @@ function createGroupRef() {
     return [];
 }
 exports.createGroupRef = createGroupRef;
+var clusterRefGlobal = ["GLOBAL_CLUSTER_REF"];
 function buildMethod() {
     var inputs = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         inputs[_i] = arguments[_i];
     }
     switch (inputs.length) {
-        case 1: return _build_(undefined, createGroupRef(), inputs[0]);
-        case 2: return _build_(undefined, inputs[0], inputs[1]);
+        case 1: return buildFnPromise(undefined, createGroupRef(), inputs[0]);
+        case 2: return buildFnPromise(undefined, inputs[0], inputs[1]);
     }
 }
 exports.buildMethod = buildMethod;
-var clusterRefGlobal = ["GLOBAL_CLUSTER_REF"];
 function build() {
     var inputs = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         inputs[_i] = arguments[_i];
     }
     switch (inputs.length) {
-        case 1: return _build_(clusterRefGlobal, createGroupRef(), inputs[0]);
-        case 2: return _build_(clusterRefGlobal, inputs[0], inputs[1]);
+        case 1: return buildFnPromise(clusterRefGlobal, createGroupRef(), inputs[0]);
+        case 2: return buildFnPromise(clusterRefGlobal, inputs[0], inputs[1]);
     }
 }
 exports.build = build;
@@ -87,7 +107,7 @@ function getExecQueueFromFunction(runExclusiveFunction, clusterRef) {
         return undefined;
     return execQueue;
 }
-function _build_(clusterRef, groupRef, fun) {
+function buildFnPromise(clusterRef, groupRef, fun) {
     var out = (function () {
         var _this = this;
         var inputs = [];
@@ -130,6 +150,94 @@ function _build_(clusterRef, groupRef, fun) {
                 }
                 catch (error) {
                     onComplete({ "reason": error });
+                }
+            }).apply(_this, inputs);
+        });
+    });
+    execQueueRefByFunction.set(out, {
+        "clusterRefLastCall": (clusterRef === undefined) ? undefined : clusterRef,
+        groupRef: groupRef
+    });
+    return out;
+}
+function buildMethodCb() {
+    var inputs = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        inputs[_i] = arguments[_i];
+    }
+    switch (inputs.length) {
+        case 1: return buildFnCallback(undefined, createGroupRef(), inputs[0]);
+        case 2: return buildFnCallback(undefined, inputs[0], inputs[1]);
+    }
+}
+exports.buildMethodCb = buildMethodCb;
+function buildCb() {
+    var inputs = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        inputs[_i] = arguments[_i];
+    }
+    switch (inputs.length) {
+        case 1: return buildFnCallback(clusterRefGlobal, createGroupRef(), inputs[0]);
+        case 2: return buildFnCallback(clusterRefGlobal, inputs[0], inputs[1]);
+    }
+}
+exports.buildCb = buildCb;
+function buildFnCallback(clusterRef, groupRef, fun) {
+    var out = (function () {
+        var _this = this;
+        var inputs = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            inputs[_i] = arguments[_i];
+        }
+        var execQueue;
+        if (clusterRef === undefined) {
+            execQueue = getOrCreateExecQueue(this, groupRef);
+            execQueueRefByFunction.get(out).clusterRefLastCall = this;
+        }
+        else {
+            execQueue = getOrCreateExecQueue(clusterRef, groupRef);
+        }
+        var callback = undefined;
+        if (inputs.length && typeof inputs[inputs.length - 1] === "function")
+            callback = inputs.pop();
+        return new Promise(function (resolve, reject) {
+            var onComplete = function () {
+                var inputs = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    inputs[_i] = arguments[_i];
+                }
+                execQueue.isRunning = false;
+                if (execQueue.queuedCalls.length)
+                    execQueue.queuedCalls.shift()();
+                if (callback)
+                    callback.apply(_this, inputs);
+                switch (inputs.length) {
+                    case 0:
+                        resolve();
+                        break;
+                    case 1:
+                        resolve(inputs[0]);
+                        break;
+                    default: resolve(inputs);
+                }
+            };
+            onComplete.hasCallback = (callback) ? true : false;
+            (function callee() {
+                var _this = this;
+                var inputs = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    inputs[_i] = arguments[_i];
+                }
+                if (execQueue.isRunning) {
+                    execQueue.queuedCalls.push(function () { return callee.apply(_this, inputs); });
+                    return;
+                }
+                execQueue.isRunning = true;
+                try {
+                    fun.apply(this, __spread(inputs, [onComplete]));
+                }
+                catch (error) {
+                    reject(error);
                 }
             }).apply(_this, inputs);
         });

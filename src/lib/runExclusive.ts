@@ -46,27 +46,27 @@ export function createGroupRef(): GroupRef {
     return [];
 }
 
+const clusterRefGlobal = [ "GLOBAL_CLUSTER_REF" ];
 
 export function buildMethod<T extends (...input: any[]) => Promise<any>>(fun: T): T;
 export function buildMethod<T extends (...input: any[]) => Promise<any>>(groupRef: GroupRef, fun: T): T;
 export function buildMethod(...inputs: any[]): any {
 
     switch (inputs.length) {
-        case 1: return _build_(undefined, createGroupRef(), inputs[0]);
-        case 2: return _build_(undefined, inputs[0], inputs[1]);
+        case 1: return buildFnPromise(undefined, createGroupRef(), inputs[0]);
+        case 2: return buildFnPromise(undefined, inputs[0], inputs[1]);
     }
 
 }
 
-const clusterRefGlobal = [ "GLOBAL_CLUSTER_REF" ];
 
 export function build<T extends (...input: any[]) => Promise<any>>(fun: T): T;
 export function build<T extends (...input: any[]) => Promise<any>>(groupRef: GroupRef, fun: T): T;
 export function build(...inputs: any[]): any {
 
     switch (inputs.length) {
-        case 1: return _build_(clusterRefGlobal, createGroupRef(), inputs[0]);
-        case 2: return _build_(clusterRefGlobal, inputs[0], inputs[1]);
+        case 1: return buildFnPromise(clusterRefGlobal, createGroupRef(), inputs[0]);
+        case 2: return buildFnPromise(clusterRefGlobal, inputs[0], inputs[1]);
     }
 
 }
@@ -138,7 +138,7 @@ function getExecQueueFromFunction(
 }
 
 
-function _build_<T extends (...inputs: any[]) => Promise<any>>(
+function buildFnPromise<T extends (...inputs: any[]) => Promise<any>>(
     clusterRef: ClusterRef | undefined,
     groupRef: GroupRef,
     fun: T
@@ -209,3 +209,115 @@ function _build_<T extends (...inputs: any[]) => Promise<any>>(
     return out;
 
 }
+
+
+
+
+export function buildMethodCb<T extends (...input: any[]) => any>(fun: T): T;
+export function buildMethodCb<T extends (...input: any[]) => any>(groupRef: GroupRef, fun: T): T;
+export function buildMethodCb(...inputs: any[]): any {
+
+    switch (inputs.length) {
+        case 1: return buildFnCallback(undefined, createGroupRef(), inputs[0]);
+        case 2: return buildFnCallback(undefined, inputs[0], inputs[1]);
+    }
+
+}
+
+
+export function buildCb<T extends (...input: any[]) => any>(fun: T): T;
+export function buildCb<T extends (...input: any[]) => any>(groupRef: GroupRef, fun: T): T;
+export function buildCb(...inputs: any[]): any {
+
+    switch (inputs.length) {
+        case 1: return buildFnCallback(clusterRefGlobal, createGroupRef(), inputs[0]);
+        case 2: return buildFnCallback(clusterRefGlobal, inputs[0], inputs[1]);
+    }
+
+}
+
+
+function buildFnCallback<T extends (...inputs: any[]) => Promise<any>>(
+    clusterRef: ClusterRef | undefined,
+    groupRef: GroupRef,
+    fun: T
+): T {
+
+    let out = (function (...inputs) {
+
+        let execQueue: ExecQueue;
+
+        if (clusterRef === undefined) {
+
+            execQueue = getOrCreateExecQueue(this, groupRef);
+
+            execQueueRefByFunction.get(out)!.clusterRefLastCall = this;
+
+        }else{
+
+            execQueue = getOrCreateExecQueue(clusterRef, groupRef);
+
+        }
+
+        let callback: Function | undefined= undefined;
+
+        if( inputs.length && typeof inputs[inputs.length-1] === "function" )
+            callback= inputs.pop();
+
+        return new Promise<any>((resolve, reject) => {
+
+            let onComplete = (...inputs) => {
+
+                execQueue!.isRunning = false;
+
+                if (execQueue!.queuedCalls.length)
+                    execQueue!.queuedCalls.shift()!();
+
+                if (callback)
+                    callback.apply(this, inputs);
+
+                switch( inputs.length ){
+                    case 0: resolve(); break;
+                    case 1: resolve(inputs[0]); break;
+                    default: resolve(inputs);
+                }
+
+
+            };
+
+            (onComplete as any).hasCallback = (callback) ? true : false;
+
+            (function callee(...inputs) {
+
+                if (execQueue!.isRunning) {
+                    execQueue!.queuedCalls.push(() => callee.apply(this, inputs));
+                    return;
+                }
+
+                execQueue!.isRunning = true;
+
+                try {
+
+                    fun.apply(this, [...inputs, onComplete]);
+
+                } catch (error) {
+
+                    reject(error);
+
+                }
+
+            }).apply(this, inputs);
+
+        });
+
+    }) as T;
+
+    execQueueRefByFunction.set(out, {
+        "clusterRefLastCall": (clusterRef === undefined) ? undefined : clusterRef,
+        groupRef
+    });
+
+    return out;
+
+}
+

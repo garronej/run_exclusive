@@ -1,7 +1,7 @@
 {
   "name": "run-exclusive",
   "version": "1.1.0",
-  "description": "A lib to prevent concurrent call to a function or a group of functions",
+  "description": "Implement function locks",
   "repository": {
     "type": "git",
     "url": "git://github.com/garronej/run-exclusive.git"

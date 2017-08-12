@@ -1,7 +1,5 @@
-import * as runExclusive from "../lib/runExclusive";
+import * as runExclusive from "../../lib/runExclusive";
 require("colors");
-
-
 
 class MyClass {
 
@@ -11,14 +9,13 @@ class MyClass {
 
     public static readonly groupRef = runExclusive.createGroupRef();
 
-    public myMethod = runExclusive.buildMethod(MyClass.groupRef,
-        async (char: string, wait: number): Promise<string> => {
+    public myMethod = runExclusive.buildMethodCb(MyClass.groupRef,
+        (char: string, wait: number, callback?: (alphabet: string)=> void): void => {
 
-            await new Promise<void>(resolve => setTimeout(resolve, wait));
-
-            this.alphabet += char;
-
-            return this.alphabet;
+            setTimeout(() => {
+                this.alphabet += char;
+                callback!(this.alphabet);
+            }, wait);
 
         }
     );
@@ -31,8 +28,8 @@ let start = Date.now();
 
 let inst1 = new MyClass();
 
-inst1.myMethod.call(MyClass, "a", 1000).then(alphabet => console.log(alphabet));
-inst1.myMethod.call(MyClass, "b", 1000).then(alphabet => console.log(alphabet));
+inst1.myMethod.call(MyClass, "a", 1000, alphabet => console.log(alphabet));
+inst1.myMethod.call(MyClass, "b", 1000, alphabet => console.log(alphabet));
 
 let inst2 = new MyClass();
 
@@ -40,9 +37,9 @@ let rev = ["n", "m", "l", "k", "j", "i", "h", "g", "f", "e", "d", "c", "b"];
 let wait = 500;
 
 for (let char of rev)
-    inst2.myMethod.call(MyClass, char, wait).then(alphabet => console.log(alphabet.blue));
+    inst2.myMethod.call(MyClass, char, wait, alphabet => console.log(alphabet.blue));
 
-inst2.myMethod.call(MyClass, "a", wait).then(function () {
+inst2.myMethod.call(MyClass, "a", wait, function () {
 
     //cSpell: disable
     console.assert(inst2.alphabet === "nmlkjihgfedcba");
@@ -50,8 +47,8 @@ inst2.myMethod.call(MyClass, "a", wait).then(function () {
 
 });
 
-inst1.myMethod.call(MyClass, "c", 1000).then(alphabet => console.log(alphabet));
-inst1.myMethod.call(MyClass, "d", 1000).then(() => {
+inst1.myMethod.call(MyClass, "c", 1000, alphabet => console.log(alphabet));
+inst1.myMethod.call(MyClass, "d", 1000, () => {
 
     let duration = Date.now() - start;
 
