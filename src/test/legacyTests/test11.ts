@@ -32,7 +32,7 @@ class MyClassProxy {
 
     public callCount = 0;
 
-    public get alphabet(): typeof MyClass.prototype.alphabet {
+    public getAlphabet(): typeof MyClass.prototype.alphabet {
         return this.myClassInst.alphabet;
     }
 
@@ -57,13 +57,13 @@ setTimeout(() => {
 
     console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 3);
 
-    console.assert(inst.alphabet === "ab");
+    console.assert(inst.getAlphabet() === "ab");
 
     runExclusive.cancelAllQueuedCalls(inst.myMethod);
 
     setTimeout(() => {
 
-        console.assert(inst.alphabet === "abc");
+        console.assert(inst.getAlphabet() === "abc");
 
         console.log("PASS".green);
 

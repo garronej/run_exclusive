@@ -32,7 +32,7 @@ export class MyClassProxy {
 
     public readonly evtCreate = new VoidSyncEvent();
 
-    public get alphabet(): typeof MyClass.prototype.alphabet {
+    public getAlphabet(): typeof MyClass.prototype.alphabet {
         if (!this.myClassInst) return "";
         else return this.myClassInst.alphabet;
     }
@@ -72,13 +72,13 @@ setTimeout(() => {
 
     console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 3);
 
-    console.assert(inst.alphabet === "ab");
+    console.assert(inst.getAlphabet() === "ab");
 
     runExclusive.cancelAllQueuedCalls(inst.myMethod);
 
     setTimeout(() => {
 
-        console.assert(inst.alphabet === "abc");
+        console.assert(inst.getAlphabet() === "abc");
 
         console.log("PASS".green);
 

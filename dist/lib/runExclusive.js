@@ -19,7 +19,7 @@ var __spread = (this && this.__spread) || function () {
     for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
     return ar;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var ExecQueue = (function () {
     function ExecQueue() {
         this.queuedCalls = [];
@@ -145,8 +145,7 @@ function buildFnPromise(clusterRef, groupRef, fun) {
                 execQueue.isRunning = true;
                 try {
                     fun.apply(this, inputs)
-                        .then(function (data) { return onComplete({ data: data }); })
-                        .catch(function (reason) { return onComplete({ reason: reason }); });
+                        .then(function (data) { return onComplete({ data: data }); })["catch"](function (reason) { return onComplete({ reason: reason }); });
                 }
                 catch (error) {
                     onComplete({ "reason": error });
