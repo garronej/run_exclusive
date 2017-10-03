@@ -20,7 +20,7 @@ var __spread = (this && this.__spread) || function () {
     return ar;
 };
 exports.__esModule = true;
-var ExecQueue = (function () {
+var ExecQueue = /** @class */ (function () {
     function ExecQueue() {
         this.queuedCalls = [];
         this.isRunning = false;
