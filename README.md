@@ -102,7 +102,7 @@ spell("c").then(()=> console.log(alphabet)); // output=> "aBc"
 ## Defining class method
 
 If you define class methods with this module you probably want the lock to be restricted
-to the instance of the class.
+to the class's object instance.
 
 ````typescript
 
