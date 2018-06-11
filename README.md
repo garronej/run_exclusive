@@ -175,7 +175,34 @@ and how many calls are queued.
 It is also possible to cancel all queued calls.
 
 ````typescript
-export declare function getQueuedCallCount(runExclusiveFunction: Function): number;
-export declare function cancelAllQueuedCalls(runExclusiveFunction: Function): number;
-export declare function isRunning(runExclusiveFunction: Function): boolean;
+/**
+ *
+ * Get the number of queued call of a run-exclusive function.
+ * Note that if you call a runExclusive function and call this
+ * directly after it will return 0 as there is one function call
+ * running but 0 queued.
+ *
+ * The classInstanceObject parameter is to provide only for the run-exclusive
+ * function created with 'buildMethod[Cb].
+ *
+ * */
+export declare function getQueuedCallCount(runExclusiveFunction: Function, classInstanceObject?: Object): number;
+/**
+ *
+ * Cancel all queued calls of a run-exclusive function.
+ * Note that the current running call will not be cancelled.
+ *
+ * The classInstanceObject parameter is to provide only for the run-exclusive
+ * function created with 'buildMethod[Cb].
+ *
+ */
+export declare function cancelAllQueuedCalls(runExclusiveFunction: Function, classInstanceObject?: Object): number;
+/**
+ * Tell if a run-exclusive function has an instance of it's call currently being
+ * performed.
+ *
+ * The classInstanceObject parameter is to provide only for the run-exclusive
+ * function created with 'buildMethod[Cb].
+ */
+export declare function isRunning(runExclusiveFunction: Function, classInstanceObject?: Object): boolean;
 ````

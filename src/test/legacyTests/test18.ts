@@ -1,9 +1,6 @@
 import * as runExclusive from "../../lib/runExclusive";
 import { SyncEvent } from "ts-events-extended";
 
-
-require("colors");
-
 export class MyClass {
 
     constructor() { };

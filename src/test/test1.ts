@@ -1,7 +1,5 @@
 import * as runExclusive from "../lib/runExclusive";
 
-require("colors");
-
 class MyClass {
 
     constructor() { };
@@ -43,6 +41,6 @@ inst.myMethodStack("j").then( alphabet => {
     console.assert(alphabet === "abcdefghij");
     //cSpell: enable
 
-    console.log("PASS".green);
+    console.log("PASS");
 
 });

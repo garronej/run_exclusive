@@ -1,7 +1,5 @@
 import * as runExclusive from "../../lib/runExclusive";
 
-require("colors");
-
 let runExclusiveFunction= runExclusive.buildCb(
     (callback)=> callback()
 );

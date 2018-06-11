@@ -1,9 +1,6 @@
 import * as runExclusive from "../../lib/runExclusive";
 import { SyncEvent } from "ts-events-extended";
 
-
-require("colors");
-
 let runCount= 0;
 
 export class MyClass{
@@ -32,7 +29,9 @@ let inst= new MyClass();
 
 (async()=> {
 
-    let [ out1, out2 ]= await inst.myMethod("yo")
+    let [ out1, out2 ]= await new Promise<[string, number]>(
+        resolve=> inst.myMethod("yo", (out1, out2)=> [ out1, out2 ])
+    );
 
     console.assert(out1 === "yo 0K" && out2 === 666 );
 

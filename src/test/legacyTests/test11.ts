@@ -1,8 +1,5 @@
 import * as runExclusive from "../../lib/runExclusive";
 
-require("colors");
-
-
 class MyClass {
 
     constructor() { };
@@ -55,11 +52,11 @@ let inst = new MyClassProxy();
 
 setTimeout(() => {
 
-    console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 3);
+    console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 3);
 
     console.assert(inst.getAlphabet() === "ab");
 
-    runExclusive.cancelAllQueuedCalls(inst.myMethod);
+    runExclusive.cancelAllQueuedCalls(inst.myMethod, inst);
 
     setTimeout(() => {
 
@@ -71,17 +68,17 @@ setTimeout(() => {
 
 }, 2900);
 
-console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
-console.assert(runExclusive.isRunning(inst.myMethod) === false );
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 0);
+console.assert(runExclusive.isRunning(inst.myMethod, inst) === false );
 inst.myMethod("a");
-console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
-console.assert(runExclusive.isRunning(inst.myMethod) === true );
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 0);
+console.assert(runExclusive.isRunning(inst.myMethod, inst) === true );
 
 for (let char of ["b", "c", "d", "e", "f"])
     inst.myMethod(char, alphabet => console.log(`step ${alphabet}`));
 
-console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 5);
-console.assert(runExclusive.isRunning(inst.myMethod) === true );
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 5);
+console.assert(runExclusive.isRunning(inst.myMethod, inst) === true );
 
 
 console.assert(inst.callCount === 1);

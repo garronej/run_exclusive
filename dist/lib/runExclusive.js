@@ -1,4 +1,14 @@
 "use strict";
+var __values = (this && this.__values) || function (o) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+    if (m) return m.call(o);
+    return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -24,7 +34,14 @@ var ExecQueue = /** @class */ (function () {
     function ExecQueue() {
         this.queuedCalls = [];
         this.isRunning = false;
+        /*
+        Set of run exclusive function that use this execQueue.
+        One runExclusive function can be referenced in multiple ExecQueue if it's a method.
+        There is only one function in this set if no groupRef have been specified by the user.
+        */
+        this.runExclusiveFunctions = new Set();
     }
+    //TODO: move where it is used.
     ExecQueue.prototype.cancelAllQueuedCalls = function () {
         var n;
         this.queuedCalls.splice(0, n = this.queuedCalls.length);
@@ -32,13 +49,13 @@ var ExecQueue = /** @class */ (function () {
     };
     return ExecQueue;
 }());
-exports.ExecQueue = ExecQueue;
-var clusters = new Map();
-function getOrCreateExecQueue(clusterRef, groupRef) {
-    var execQueueByGroup = clusters.get(clusterRef);
+var globalContext = {};
+var clusters = new WeakMap();
+function getOrCreateExecQueue(context, groupRef) {
+    var execQueueByGroup = clusters.get(context);
     if (!execQueueByGroup) {
         execQueueByGroup = new Map();
-        clusters.set(clusterRef, execQueueByGroup);
+        clusters.set(context, execQueueByGroup);
     }
     var execQueue = execQueueByGroup.get(groupRef);
     if (!execQueue) {
@@ -51,86 +68,129 @@ function createGroupRef() {
     return [];
 }
 exports.createGroupRef = createGroupRef;
-var clusterRefGlobal = ["GLOBAL_CLUSTER_REF"];
-function buildMethod() {
-    var inputs = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        inputs[_i] = arguments[_i];
-    }
-    switch (inputs.length) {
-        case 1: return buildFnPromise(undefined, createGroupRef(), inputs[0]);
-        case 2: return buildFnPromise(undefined, inputs[0], inputs[1]);
-    }
-}
-exports.buildMethod = buildMethod;
 function build() {
     var inputs = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         inputs[_i] = arguments[_i];
     }
     switch (inputs.length) {
-        case 1: return buildFnPromise(clusterRefGlobal, createGroupRef(), inputs[0]);
-        case 2: return buildFnPromise(clusterRefGlobal, inputs[0], inputs[1]);
+        case 1: return buildFnPromise(true, createGroupRef(), inputs[0]);
+        case 2: return buildFnPromise(true, inputs[0], inputs[1]);
     }
 }
 exports.build = build;
-function getQueuedCallCount(runExclusiveFunction, clusterRef) {
-    var execQueue = getExecQueueFromFunction(runExclusiveFunction, clusterRef);
+function buildMethod() {
+    var inputs = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        inputs[_i] = arguments[_i];
+    }
+    switch (inputs.length) {
+        case 1: return buildFnPromise(false, createGroupRef(), inputs[0]);
+        case 2: return buildFnPromise(false, inputs[0], inputs[1]);
+    }
+}
+exports.buildMethod = buildMethod;
+/**
+ *
+ * Get the number of queued call of a run-exclusive function.
+ * Note that if you call a runExclusive function and call this
+ * directly after it will return 0 as there is one function call
+ * running but 0 queued.
+ *
+ * The classInstanceObject parameter is to provide only for the run-exclusive
+ * function created with 'buildMethod[Cb].
+ *
+ * */
+function getQueuedCallCount(runExclusiveFunction, classInstanceObject) {
+    var execQueue = getExecQueueByFunctionAndContext(runExclusiveFunction, classInstanceObject);
     return execQueue ? execQueue.queuedCalls.length : 0;
 }
 exports.getQueuedCallCount = getQueuedCallCount;
-function cancelAllQueuedCalls(runExclusiveFunction, clusterRef) {
-    var execQueue = getExecQueueFromFunction(runExclusiveFunction, clusterRef);
+/**
+ *
+ * Cancel all queued calls of a run-exclusive function.
+ * Note that the current running call will not be cancelled.
+ *
+ * The classInstanceObject parameter is to provide only for the run-exclusive
+ * function created with 'buildMethod[Cb].
+ *
+ */
+function cancelAllQueuedCalls(runExclusiveFunction, classInstanceObject) {
+    var execQueue = getExecQueueByFunctionAndContext(runExclusiveFunction, classInstanceObject);
     return execQueue ? execQueue.cancelAllQueuedCalls() : 0;
 }
 exports.cancelAllQueuedCalls = cancelAllQueuedCalls;
-function isRunning(runExclusiveFunction, clusterRef) {
-    var execQueue = getExecQueueFromFunction(runExclusiveFunction, clusterRef);
+/**
+ * Tell if a run-exclusive function has an instance of it's call currently being
+ * performed.
+ *
+ * The classInstanceObject parameter is to provide only for the run-exclusive
+ * function created with 'buildMethod[Cb].
+ */
+function isRunning(runExclusiveFunction, classInstanceObject) {
+    var execQueue = getExecQueueByFunctionAndContext(runExclusiveFunction, classInstanceObject);
     return execQueue ? execQueue.isRunning : false;
 }
 exports.isRunning = isRunning;
-var execQueueRefByFunction = new Map();
-function getExecQueueFromFunction(runExclusiveFunction, clusterRef) {
-    if (!execQueueRefByFunction.has(runExclusiveFunction))
-        throw new Error("This is not a run exclusive function");
-    var _a = execQueueRefByFunction.get(runExclusiveFunction), clusterRefLastCall = _a.clusterRefLastCall, groupRef = _a.groupRef;
-    if (clusterRef === undefined) {
-        if (clusterRefLastCall === undefined)
+function getExecQueueByFunctionAndContext(runExclusiveFunction, context) {
+    if (context === void 0) { context = globalContext; }
+    var execQueue = (function () {
+        var e_1, _a;
+        var execQueueByGroup = clusters.get(context);
+        if (!execQueueByGroup) {
             return undefined;
-        clusterRef = clusterRefLastCall;
+        }
+        try {
+            for (var _b = __values(execQueueByGroup.values()), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var execQueue_1 = _c.value;
+                if (execQueue_1.runExclusiveFunctions.has(runExclusiveFunction)) {
+                    return execQueue_1;
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b["return"])) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        return undefined;
+    })();
+    if (!execQueue && context === globalContext) {
+        throw new Error("Function is not run-exclusive");
     }
-    var execQueueByGroup = clusters.get(clusterRef);
-    if (!execQueueByGroup)
-        return undefined;
-    var execQueue = execQueueByGroup.get(groupRef);
-    if (!execQueue)
-        return undefined;
-    return execQueue;
+    else {
+        return execQueue;
+    }
 }
-function buildFnPromise(clusterRef, groupRef, fun) {
-    var out = (function () {
+function buildFnPromise(isGlobal, groupRef, fun) {
+    var execQueue;
+    var runExclusiveFunction = (function () {
         var _this = this;
         var inputs = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             inputs[_i] = arguments[_i];
         }
-        var execQueue;
-        if (clusterRef === undefined) {
+        if (!isGlobal) {
+            if (!(this instanceof Object)) {
+                throw new Error("Run exclusive, <this> should be an object");
+            }
             execQueue = getOrCreateExecQueue(this, groupRef);
-            execQueueRefByFunction.get(out).clusterRefLastCall = this;
-        }
-        else {
-            execQueue = getOrCreateExecQueue(clusterRef, groupRef);
+            execQueue.runExclusiveFunctions.add(runExclusiveFunction);
         }
         return new Promise(function (resolve, reject) {
             var onComplete = function (result) {
                 execQueue.isRunning = false;
-                if (execQueue.queuedCalls.length)
+                if (execQueue.queuedCalls.length) {
                     execQueue.queuedCalls.shift()();
-                if ("data" in result)
-                    resolve(result["data"]);
-                else
-                    reject(result["reason"]);
+                }
+                if ("data" in result) {
+                    resolve(result.data);
+                }
+                else {
+                    reject(result.reason);
+                }
             };
             (function callee() {
                 var _this = this;
@@ -153,97 +213,90 @@ function buildFnPromise(clusterRef, groupRef, fun) {
             }).apply(_this, inputs);
         });
     });
-    execQueueRefByFunction.set(out, {
-        "clusterRefLastCall": (clusterRef === undefined) ? undefined : clusterRef,
-        groupRef: groupRef
-    });
-    return out;
-}
-function buildMethodCb() {
-    var inputs = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        inputs[_i] = arguments[_i];
+    if (isGlobal) {
+        execQueue = getOrCreateExecQueue(globalContext, groupRef);
+        execQueue.runExclusiveFunctions.add(runExclusiveFunction);
     }
-    switch (inputs.length) {
-        case 1: return buildFnCallback(undefined, createGroupRef(), inputs[0]);
-        case 2: return buildFnCallback(undefined, inputs[0], inputs[1]);
-    }
+    return runExclusiveFunction;
 }
-exports.buildMethodCb = buildMethodCb;
 function buildCb() {
     var inputs = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         inputs[_i] = arguments[_i];
     }
     switch (inputs.length) {
-        case 1: return buildFnCallback(clusterRefGlobal, createGroupRef(), inputs[0]);
-        case 2: return buildFnCallback(clusterRefGlobal, inputs[0], inputs[1]);
+        case 1: return buildFnCallback(true, createGroupRef(), inputs[0]);
+        case 2: return buildFnCallback(true, inputs[0], inputs[1]);
     }
 }
 exports.buildCb = buildCb;
-function buildFnCallback(clusterRef, groupRef, fun) {
-    var out = (function () {
+function buildMethodCb() {
+    var inputs = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        inputs[_i] = arguments[_i];
+    }
+    switch (inputs.length) {
+        case 1: return buildFnCallback(false, createGroupRef(), inputs[0]);
+        case 2: return buildFnCallback(false, inputs[0], inputs[1]);
+    }
+}
+exports.buildMethodCb = buildMethodCb;
+function buildFnCallback(isGlobal, groupRef, fun) {
+    var execQueue;
+    var runExclusiveFunction = (function () {
         var _this = this;
         var inputs = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             inputs[_i] = arguments[_i];
         }
-        var execQueue;
-        if (clusterRef === undefined) {
+        if (!isGlobal) {
+            if (!(this instanceof Object)) {
+                throw new Error("Run exclusive, <this> should be an object");
+            }
             execQueue = getOrCreateExecQueue(this, groupRef);
-            execQueueRefByFunction.get(out).clusterRefLastCall = this;
-        }
-        else {
-            execQueue = getOrCreateExecQueue(clusterRef, groupRef);
+            execQueue.runExclusiveFunctions.add(runExclusiveFunction);
         }
         var callback = undefined;
-        if (inputs.length && typeof inputs[inputs.length - 1] === "function")
+        if (inputs.length && typeof inputs[inputs.length - 1] === "function") {
             callback = inputs.pop();
-        return new Promise(function (resolve, reject) {
-            var onComplete = function () {
-                var inputs = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    inputs[_i] = arguments[_i];
-                }
-                execQueue.isRunning = false;
-                if (execQueue.queuedCalls.length)
-                    execQueue.queuedCalls.shift()();
-                if (callback)
-                    callback.apply(_this, inputs);
-                switch (inputs.length) {
-                    case 0:
-                        resolve();
-                        break;
-                    case 1:
-                        resolve(inputs[0]);
-                        break;
-                    default: resolve(inputs);
-                }
-            };
-            onComplete.hasCallback = (callback) ? true : false;
-            (function callee() {
-                var _this = this;
-                var inputs = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    inputs[_i] = arguments[_i];
-                }
-                if (execQueue.isRunning) {
-                    execQueue.queuedCalls.push(function () { return callee.apply(_this, inputs); });
-                    return;
-                }
-                execQueue.isRunning = true;
-                try {
-                    fun.apply(this, __spread(inputs, [onComplete]));
-                }
-                catch (error) {
-                    reject(error);
-                }
-            }).apply(_this, inputs);
-        });
+        }
+        var onComplete = function () {
+            var inputs = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                inputs[_i] = arguments[_i];
+            }
+            execQueue.isRunning = false;
+            if (execQueue.queuedCalls.length) {
+                execQueue.queuedCalls.shift()();
+            }
+            if (callback) {
+                callback.apply(_this, inputs);
+            }
+        };
+        onComplete.hasCallback = !!callback;
+        (function callee() {
+            var _this = this;
+            var inputs = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                inputs[_i] = arguments[_i];
+            }
+            if (execQueue.isRunning) {
+                execQueue.queuedCalls.push(function () { return callee.apply(_this, inputs); });
+                return;
+            }
+            execQueue.isRunning = true;
+            try {
+                fun.apply(this, __spread(inputs, [onComplete]));
+            }
+            catch (error) {
+                error.message += " ( This exception should not have been thrown, miss use of run-exclusive buildCb )";
+                throw error;
+            }
+        }).apply(this, inputs);
     });
-    execQueueRefByFunction.set(out, {
-        "clusterRefLastCall": (clusterRef === undefined) ? undefined : clusterRef,
-        groupRef: groupRef
-    });
-    return out;
+    if (isGlobal) {
+        execQueue = getOrCreateExecQueue(globalContext, groupRef);
+        execQueue.runExclusiveFunctions.add(runExclusiveFunction);
+    }
+    return runExclusiveFunction;
 }

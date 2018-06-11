@@ -1,9 +1,6 @@
 import * as runExclusive from "../../lib/runExclusive";
 import { SyncEvent } from "ts-events-extended";
 
-
-require("colors");
-
 let runCount= 0;
 
 export class MyClass{
@@ -32,7 +29,9 @@ let inst= new MyClass();
 
 (async()=> {
 
-    let out= await inst.myMethod(111)
+    let out= await new Promise<string>(
+        resolve=> inst.myMethod(111, out=> resolve(out))
+    );
 
     console.log(out);
     console.log( out === "input: 111");

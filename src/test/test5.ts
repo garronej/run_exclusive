@@ -1,7 +1,4 @@
 import * as runExclusive from "../lib/runExclusive";
-require("colors");
-
-
 
 class MyClass {
 

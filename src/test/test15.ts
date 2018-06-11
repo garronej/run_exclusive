@@ -1,7 +1,5 @@
 import * as runExclusive from "../lib/runExclusive";
 
-require("colors");
-
 class MyClass {
 
     constructor() { };
@@ -25,26 +23,26 @@ class MyClass {
 
 let inst = new MyClass();
 
-console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
-console.assert(runExclusive.isRunning(inst.myMethod) === false);
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 0);
+console.assert(runExclusive.isRunning(inst.myMethod, inst) === false);
 
 inst.myMethod("a").then(() => {
 
-    console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 1);
-    console.assert(runExclusive.isRunning(inst.myMethod) === true);
+    console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 1);
+    console.assert(runExclusive.isRunning(inst.myMethod, inst) === true);
 
 });
 inst.myMethod("b").then(() => {
 
-    console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
-    console.assert(runExclusive.isRunning(inst.myMethod) === true);
+    console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 0);
+    console.assert(runExclusive.isRunning(inst.myMethod, inst) === true);
 
 
 });
 inst.myMethod("c").then(() => {
 
-    console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
-    console.assert(runExclusive.isRunning(inst.myMethod) === false);
+    console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 0);
+    console.assert(runExclusive.isRunning(inst.myMethod, inst) === false);
 
     console.log("PASS".green);
 

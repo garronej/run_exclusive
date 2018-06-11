@@ -1,8 +1,5 @@
 import * as runExclusive from "../../lib/runExclusive";
 
-
-require("colors");
-
 class MyClass {
 
     constructor() { };
@@ -26,13 +23,13 @@ class MyClass {
 let inst = new MyClass();
 
 
-console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
-console.assert(runExclusive.isRunning(inst.myMethod) === false);
+console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 0);
+console.assert(runExclusive.isRunning(inst.myMethod, inst) === false);
 
 inst.myMethod("a", () => {
 
-    console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 0);
-    console.assert(runExclusive.isRunning(inst.myMethod) === false);
+    console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 0);
+    console.assert(runExclusive.isRunning(inst.myMethod, inst) === false);
 
     console.log("PASS".green);
 

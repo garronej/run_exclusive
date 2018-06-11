@@ -1,8 +1,5 @@
 import * as runExclusive from "../../lib/runExclusive";
 
-require("colors");
-
-
 class MyClass {
 
     constructor() { };
@@ -29,11 +26,11 @@ let inst = new MyClass();
 
 setTimeout(() => {
 
-    console.assert(runExclusive.getQueuedCallCount(inst.myMethod) === 3);
+    console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 3);
 
     console.assert(inst.alphabet === "ab");
 
-    runExclusive.cancelAllQueuedCalls(inst.myMethod);
+    runExclusive.cancelAllQueuedCalls(inst.myMethod, inst);
 
     setTimeout(() => {
 
@@ -45,5 +42,8 @@ setTimeout(() => {
 
 }, 2900);
 
-for (let char of ["a", "b", "c", "d", "e", "f"])
+for (let char of ["a", "b", "c", "d", "e", "f"]){
+
     inst.myMethod(char, alphabet => console.log(`step ${alphabet}`));
+
+}
