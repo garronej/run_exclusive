@@ -164,7 +164,7 @@ const spell= runExclusive.buildCb(
 
 spell("a");
 spell("b");
-spell("c", message => console.log(message)); // output=> "alphabet: cba" or "alphabet: bac" or ...
+spell("c", message => console.log(message)); // message=> "alphabet: abc
 
 ````
 
