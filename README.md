@@ -205,4 +205,12 @@ export declare function cancelAllQueuedCalls(runExclusiveFunction: Function, cla
  * function created with 'buildMethod[Cb].
  */
 export declare function isRunning(runExclusiveFunction: Function, classInstanceObject?: Object): boolean;
+/**
+ * Return a promise that resolve when all the current queued call of a runExclusive functions
+ * have completed.
+ *
+ * The classInstanceObject parameter is to provide only for the run-exclusive
+ * function created with 'buildMethod[Cb].
+ */
+export declare function getPrComplete(runExclusiveFunction: Function, classInstanceObject?: Object): Promise<void>;
 ````

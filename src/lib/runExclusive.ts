@@ -5,13 +5,6 @@ class ExecQueue {
 
     public isRunning: boolean= false;
 
-    /*
-    Set of run exclusive function that use this execQueue.
-    One runExclusive function can be referenced in multiple ExecQueue if it's a method.
-    There is only one function in this set if no groupRef have been specified by the user.
-    */
-    public readonly runExclusiveFunctions= new Set<Function>();
-
     //TODO: move where it is used.
     public cancelAllQueuedCalls(): number {
 
@@ -23,13 +16,19 @@ class ExecQueue {
 
     }
 
+    public prComplete: Promise<void>= Promise.resolve();
+
 
 }
 
 
 const globalContext: Object = {};
 
-const clusters = new WeakMap<Object, Map<GroupRef,ExecQueue>>();
+const clusters = new WeakMap<Object, WeakMap<GroupRef,ExecQueue>>();
+
+//console.log("Map version");
+//export const clusters = new Map<Object, Map<GroupRef,ExecQueue>>();
+
 
 function getOrCreateExecQueue(
     context: Object, 
@@ -39,7 +38,7 @@ function getOrCreateExecQueue(
     let execQueueByGroup = clusters.get(context);
 
     if (!execQueueByGroup) {
-        execQueueByGroup = new Map();
+        execQueueByGroup = new WeakMap();
         clusters.set(context, execQueueByGroup);
     }
 
@@ -57,7 +56,7 @@ function getOrCreateExecQueue(
 export type GroupRef = never[];
 
 export function createGroupRef(): GroupRef {
-    return [];
+    return new Array<never>(0);
 }
 
 /**
@@ -153,42 +152,47 @@ export function isRunning(
 
 }
 
+/**
+ * Return a promise that resolve when all the current queued call of a runExclusive functions
+ * have completed.
+ * 
+ * The classInstanceObject parameter is to provide only for the run-exclusive
+ * function created with 'buildMethod[Cb].
+ */
+export function getPrComplete(
+    runExclusiveFunction: Function,
+    classInstanceObject?: Object
+): Promise<void>{
+
+    const execQueue= getExecQueueByFunctionAndContext(runExclusiveFunction, classInstanceObject);
+
+    return execQueue?execQueue.prComplete:Promise.resolve();
+
+}
+
+const groupByRunExclusiveFunction= new WeakMap<Function, GroupRef>();
+
 function getExecQueueByFunctionAndContext(
     runExclusiveFunction: Function,
     context = globalContext
 ): ExecQueue | undefined {
 
-    const execQueue = (() => {
+    const groupRef= groupByRunExclusiveFunction.get(runExclusiveFunction);
 
-        const execQueueByGroup = clusters.get(context);
-
-        if (!execQueueByGroup) {
-            return undefined;
-        }
-
-        for (const execQueue of execQueueByGroup.values()) {
-
-            if (execQueue.runExclusiveFunctions.has(runExclusiveFunction)) {
-                return execQueue;
-            }
-
-        }
-
-        return undefined;
-
-    })();
-
-    if( !execQueue && context === globalContext ){
-
-        throw new Error("Function is not run-exclusive");
-
-    }else{
-
-        return execQueue;
-
+    if( !groupRef ){
+        throw Error("Not a run exclusiveFunction");
     }
 
+    const execQueueByGroup= clusters.get(context);
+
+    if( !execQueueByGroup ){
+        return undefined;
+    }
+
+    return execQueueByGroup.get(groupRef)!;
+
 }
+
 
 function buildFnPromise<T extends (...inputs: any[]) => Promise<any>>(
     isGlobal: boolean,
@@ -208,13 +212,19 @@ function buildFnPromise<T extends (...inputs: any[]) => Promise<any>>(
 
             execQueue = getOrCreateExecQueue(this, groupRef);
 
-            execQueue.runExclusiveFunctions.add(runExclusiveFunction);
-
         }
 
         return new Promise<any>((resolve, reject) => {
 
+            let onPrCompleteResolve: () => void;
+
+            execQueue.prComplete = new Promise(resolve =>
+                onPrCompleteResolve = () => resolve()
+            );
+
             const onComplete = (result: { data: any } | { reason: any }) => {
+
+                onPrCompleteResolve();
 
                 execQueue.isRunning = false;
 
@@ -243,7 +253,8 @@ function buildFnPromise<T extends (...inputs: any[]) => Promise<any>>(
 
                     fun.apply(this, inputs)
                         .then(data => onComplete({ data }))
-                        .catch(reason => onComplete({ reason }));
+                        .catch(reason => onComplete({ reason }))
+                        ;
 
                 } catch (error) {
 
@@ -261,9 +272,9 @@ function buildFnPromise<T extends (...inputs: any[]) => Promise<any>>(
 
         execQueue = getOrCreateExecQueue(globalContext, groupRef);
 
-        execQueue.runExclusiveFunctions.add(runExclusiveFunction);
-
     }
+
+    groupByRunExclusiveFunction.set(runExclusiveFunction, groupRef);
 
     return runExclusiveFunction;
 
@@ -327,6 +338,7 @@ function buildFnCallback<T extends (...inputs: any[]) => Promise<any>>(
 
     const runExclusiveFunction = (function (...inputs) {
 
+
         if (!isGlobal) {
 
             if (!(this instanceof Object)) {
@@ -334,8 +346,6 @@ function buildFnCallback<T extends (...inputs: any[]) => Promise<any>>(
             }
 
             execQueue = getOrCreateExecQueue(this, groupRef);
-
-            execQueue.runExclusiveFunctions.add(runExclusiveFunction);
 
         }
 
@@ -345,7 +355,15 @@ function buildFnCallback<T extends (...inputs: any[]) => Promise<any>>(
             callback = inputs.pop();
         }
 
+        let onPrCompleteResolve: () => void;
+
+        execQueue.prComplete = new Promise(resolve =>
+            onPrCompleteResolve = () => resolve()
+        );
+
         const onComplete = (...inputs) => {
+            
+            onPrCompleteResolve();
 
             execQueue!.isRunning = false;
 
@@ -390,9 +408,9 @@ function buildFnCallback<T extends (...inputs: any[]) => Promise<any>>(
 
         execQueue = getOrCreateExecQueue(globalContext, groupRef);
 
-        execQueue.runExclusiveFunctions.add(runExclusiveFunction);
-
     }
+
+    groupByRunExclusiveFunction.set(runExclusiveFunction, groupRef);
 
     return runExclusiveFunction;
 

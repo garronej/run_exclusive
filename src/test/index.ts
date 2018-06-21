@@ -16,7 +16,7 @@ if (n) {
 
     require("./legacyTests/index");
 
-    for (let i = 1; i <= 17; i++) {
+    for (let i = 1; i <= 18; i++) {
 
         try {
             require("./test" + i);

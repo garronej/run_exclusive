@@ -1,22 +1,20 @@
 import * as runExclusive from "../../lib/runExclusive";
 
-const groupRefAlphabet= runExclusive.createGroupRef();
+const groupRefAlphabet = runExclusive.createGroupRef();
 
-class MyClass1{
+class MyClass1 {
 
-    constructor(){};
+    constructor() { };
 
-    public alphabet= "";
+    public alphabet = "";
 
-    public myMethod= runExclusive.buildCb(groupRefAlphabet,
-        (char: string, wait: number, callback?: (alphabet: string)=> void): void => {
+    public myMethod = runExclusive.buildCb(groupRefAlphabet,
+        (char: string, wait: number, callback?: (alphabet: string) => void): void => {
 
-        let safeCallback= callback || function(){};
-
-        setTimeout(()=> {
-            this.alphabet += char.toUpperCase();
-            safeCallback(this.alphabet);
-        }, wait);
+            setTimeout(() => {
+                this.alphabet += char.toUpperCase();
+                callback!(this.alphabet);
+            }, wait);
 
         });
 
@@ -58,8 +56,10 @@ let inst2 = new MyClass2();
 let rev = ["n", "m", "l", "k", "j", "i", "h", "g", "f", "e", "d", "c", "b"];
 let wait = 500;
 
-for (let char of rev)
+for (let char of rev){
     inst2.myMethod(char, wait, alphabet => console.log(alphabet.blue));
+}
+
 inst2.myMethod("a", wait, function () {
 
     //cSpell: disable
