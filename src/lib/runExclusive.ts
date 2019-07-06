@@ -1,4 +1,6 @@
 
+import { Polyfill as WeakMap } from "minimal-polyfills/dist/lib/WeakMap";
+
 class ExecQueue {
 
     public readonly queuedCalls: Function[]=[];

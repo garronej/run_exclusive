@@ -20,6 +20,7 @@ var __spread = (this && this.__spread) || function () {
     return ar;
 };
 exports.__esModule = true;
+var WeakMap_1 = require("minimal-polyfills/dist/lib/WeakMap");
 var ExecQueue = /** @class */ (function () {
     function ExecQueue() {
         this.queuedCalls = [];
@@ -35,13 +36,13 @@ var ExecQueue = /** @class */ (function () {
     return ExecQueue;
 }());
 var globalContext = {};
-var clusters = new WeakMap();
+var clusters = new WeakMap_1.Polyfill();
 //console.log("Map version");
 //export const clusters = new Map<Object, Map<GroupRef,ExecQueue>>();
 function getOrCreateExecQueue(context, groupRef) {
     var execQueueByGroup = clusters.get(context);
     if (!execQueueByGroup) {
-        execQueueByGroup = new WeakMap();
+        execQueueByGroup = new WeakMap_1.Polyfill();
         clusters.set(context, execQueueByGroup);
     }
     var execQueue = execQueueByGroup.get(groupRef);
@@ -131,7 +132,7 @@ function getPrComplete(runExclusiveFunction, classInstanceObject) {
     return execQueue ? execQueue.prComplete : Promise.resolve();
 }
 exports.getPrComplete = getPrComplete;
-var groupByRunExclusiveFunction = new WeakMap();
+var groupByRunExclusiveFunction = new WeakMap_1.Polyfill();
 function getExecQueueByFunctionAndContext(runExclusiveFunction, context) {
     if (context === void 0) { context = globalContext; }
     var groupRef = groupByRunExclusiveFunction.get(runExclusiveFunction);
