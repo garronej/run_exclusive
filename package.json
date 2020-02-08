@@ -1,7 +1,7 @@
 {
   "name": "run-exclusive",
   "version": "2.1.2",
-  "description": "Implement function locks",
+  "description": "Generate functions that do not allow parallel executions",
   "repository": {
     "type": "git",
     "url": "git://github.com/garronej/run-exclusive.git"
@@ -16,8 +16,11 @@
   "license": "MIT",
   "keywords": [
     "mutex",
-    "typescript",
-    "lock"
+    "async-await",
+    "lock",
+    "callback",
+    "promise",
+    "typescript"
   ],
   "dependencies": {
     "minimal-polyfills": "^1.0.2"
