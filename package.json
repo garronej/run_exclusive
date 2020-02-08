@@ -9,19 +9,24 @@
   "main": "./dist/lib/runExclusive.js",
   "types": "./dist/lib/runExclusive.d.ts",
   "scripts": {
-    "tsc": "./node_modules/.bin/tsc -p ./tsconfig.json",
+    "tsc": "npx tsc -p ./tsconfig.json",
     "test": "node ./dist/test/index"
   },
   "author": "Joseph Garrone",
   "license": "MIT",
+  "keywords": [
+    "mutex",
+    "typescript",
+    "lock"
+  ],
   "dependencies": {
-    "minimal-polyfills": "github:garronej/minimal-polyfills"
+    "minimal-polyfills": "^1.0.1"
   },
   "devDependencies": {
     "@types/node": "^10.3.2",
     "@types/colors": "^1.2.1",
     "colors": "^1.3.0",
-    "ts-events-extended": "garronej/ts-events-extended",
+    "ts-evt": "^4.3.3",
     "typescript": "^2.9.1"
   }
 }

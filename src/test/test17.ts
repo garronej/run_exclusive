@@ -1,7 +1,6 @@
 //Import ExecStack to be able to export stacked function
 
 import * as runExclusive from "../lib/runExclusive";
-import { SyncEvent } from "ts-events-extended";
 
 let runCount = 0;
 

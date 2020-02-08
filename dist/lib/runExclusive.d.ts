@@ -19,7 +19,7 @@ export declare function buildMethod<T extends (...input: any[]) => Promise<any>>
  * Get the number of queued call of a run-exclusive function.
  * Note that if you call a runExclusive function and call this
  * directly after it will return 0 as there is one function call
- * running but 0 queued.
+ * execution ongoing but 0 queued.
  *
  * The classInstanceObject parameter is to provide only for the run-exclusive
  * function created with 'buildMethod[Cb].
