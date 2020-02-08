@@ -20,7 +20,7 @@
     "lock"
   ],
   "dependencies": {
-    "minimal-polyfills": "^1.0.1"
+    "minimal-polyfills": "^1.0.2"
   },
   "devDependencies": {
     "@types/node": "^10.3.2",
