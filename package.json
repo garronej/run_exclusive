@@ -22,6 +22,7 @@
     "promise",
     "typescript"
   ],
+  "homepage": "https://garronej.github.io/run-exclusive",
   "dependencies": {
     "minimal-polyfills": "^1.0.2"
   },
