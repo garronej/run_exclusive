@@ -1,6 +1,6 @@
 {
   "name": "run-exclusive",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Generate functions that do not allow parallel executions",
   "repository": {
     "type": "git",
@@ -20,7 +20,8 @@
     "lock",
     "callback",
     "promise",
-    "typescript"
+    "typescript",
+    "type-safe"
   ],
   "homepage": "https://garronej.github.io/run-exclusive",
   "dependencies": {

@@ -1,5 +1,3 @@
-
-
 <p align="center">
     <img src="https://user-images.githubusercontent.com/6702424/74085997-1d3c1400-4a7f-11ea-9abf-81a4352f827f.png">  
 </p>
@@ -19,28 +17,56 @@ Let you create functions that enforce no more than one execution happens at the 
 If the function is called again while there is already an execution ongoing the new call will be queued and executed once all the queued calls have completed.
 
 This is a higher-level approach to the problem addressed by [`DirtyHairy/async-mutex`](https://www.npmjs.com/package/async-mutex).    
-While being fitted for a smaller set of use-cases, this library is way less verbose and much easier to use than `async-mutex` is.
 
- <b>Browserify friendly:</b>
+<b>Browserify friendly:</b>
 
 - No polyfills needed ✅  
 - Transpiled down to ES3 ✅  
-- Ultra light ✅
+- Ultra light ✅  
 
-## Usage
+# Try it now
 
-Let us compare a run-exclusive function with a regular function.
+Thanks to Stackblitz you can try this lib with within your browser like if you where in VSCode. 
 
-### Regular function
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/6702424/74528376-70531280-4f28-11ea-9545-46d258b74454.png">  
+</p>
+
+[__Run the example__](https://stackblitz.com/edit/run-exclusive-hello-world?embed=1&file=index.ts)
+
+# Table of content
+
+- [Try it now](#try-it-now)
+- [Table of content](#table-of-content)
+- [Documentation](#documentation)
+  - [``build()``](#build)
+  - [``createGroupRef()``](#creategroupref)
+  - [``buildMethod()``](#buildmethod)
+  - [``buildCb()`` and ``buildMethodCb()``](#buildcb-and-buildmethodcb)
+  - [Queued calls](#queued-calls)
+    - [``getQueuedCallCount()``](#getqueuedcallcount)
+    - [``cancelAllQueuedCalls()``](#cancelallqueuedcalls)
+    - [``isRunning()``](#isrunning)
+    - [``getPrComplete()``](#getprcomplete)
+
+# Documentation
+
+## ``build()``
+
+Let us compare regular functions with `run-exclusive` functions.
 
 ````typescript
-
 let alphabet= "";
 
 //This function wait a random time then append a letter to alphabet.
 async function spell(letter: string): Promise<string>{
 
-    await new Promise<void>(resolve=> setTimeout(resolve, Math.random()*100));
+    await new Promise(
+        resolve=> setTimeout(
+            resolve, 
+            Math.random()*100
+        )
+    );
 
     alphabet+=letter;
 
@@ -55,12 +81,9 @@ spell("c").then( message => console.log(message));
 //it can be "c", "ca", "ac", "cb", "bc", "cab", "cba", "bac", "bca", "acb" or "abc"
 
 ````
-
-### Run exclusive function
-
+Now the same example using ``run-exclusive``:  
 
 ````typescript
-
 import * as runExclusive from "run-exclusive";
 
 let alphabet= "";
@@ -68,7 +91,12 @@ let alphabet= "";
 const spell= runExclusive.build(
     async (letter: string): Promise<string> => {
 
-        await new Promise<void>(resolve=> setTimeout(resolve, Math.random()*100));
+        await new Promise(
+            resolve=>setTimeout(
+                resolve, 
+                Math.random()*100
+            )
+        ); 
 
         alphabet+=letter;
 
@@ -86,11 +114,11 @@ spell("c").then( message => console.log(message)); // Always prints "abc"
 The types definition of the function passed as argument are conserved.
 ![Screenshot 2020-02-08 at 15 42 09](https://user-images.githubusercontent.com/6702424/74087111-9a6c8680-4a89-11ea-99f5-d5db809835f2.png)
 
+## ``createGroupRef()``
 
-## Sharing a unique lock among a group of functions
+To share a unique lock among a group of functions.
 
 ````typescript
-
 import * as runExclusive from "run-exclusive";
 
 let alphabet= "";
@@ -120,10 +148,9 @@ const spellLowerCase= runExclusive.build(groupSpelling
 spell("a");
 spellUpperCase("b");
 spell("c").then(()=> console.log(alphabet)); //prints "aBc".
-
 ````
 
-## Defining class method
+## ``buildMethod()``
 
 If you define run exclusive class methods chances are you want the lock to be restricted
 to the class's object instance.  
@@ -147,8 +174,8 @@ class Student {
 
 }
 
-let alice= new Student();
-let bob= new Student();
+const alice= new Student();
+const bob= new Student();
 
 alice.spell("A");
 bob.spell("a");
@@ -159,7 +186,7 @@ bob.spell("c").then( ()=> console.log(bob.alphabet)); //prints after 3s: "abc"
 
 ````
 
-## Using callback instead of promises.
+## ``buildCb()`` and ``buildMethodCb()``
 
 `buildCb()` is the pending of `build()` for creating run exclusive functions that complete by invoking a callback. (Instead of resolving a promise).
 
@@ -198,50 +225,67 @@ spell("c", message => console.log(message)); // prints "abc"
 
 ````
 
-## Checking the queuedCalls of a run exclusive function
+NOTE: ``runExclusive.buildMethodCb()`` also available.
 
-It is possible to check, for a given run exclusive function, if it is currently
+## Queued calls 
+
+It is possible to check, for a given run exclusive function, if there is currently
 an ongoing execution and how many calls are queued.
 It is also possible to cancel the queued calls.
 
+### ``getQueuedCallCount()``
+
+ Get the number of queued call of a run-exclusive function. 
+ Note that if you call a runExclusive function and call this 
+ directly after it will return 0 as there is one function call
+ execution ongoing but 0 queued.  
+ 
+ The classInstanceObject parameter is to provide only for the run-exclusive
+ function created with 'buildMethod[Cb].
+
+```typescript
+export declare function getQueuedCallCount(
+    runExclusiveFunction: Function, 
+    classInstanceObject?: Object
+): number;
+```
+
+### ``cancelAllQueuedCalls()``
+Cancel all queued calls of a run-exclusive function.
+Note that the current running call will not be cancelled.  
+
+The classInstanceObject parameter is to provide only for the run-exclusive
+function created with 'buildMethod[Cb].
+```typescript
+export declare function cancelAllQueuedCalls(
+    runExclusiveFunction: Function, 
+    classInstanceObject?: Object
+): number;
+```
+### ``isRunning()``
+
+Tell if a run-exclusive function has an instance of it's call currently being
+performed.
+
+The classInstanceObject parameter is to provide only for the run-exclusive
+function created with 'buildMethod[Cb].
+```typescript
+export declare function isRunning(
+    runExclusiveFunction: Function, 
+    classInstanceObject?: Object
+): boolean;
+```
+
+### ``getPrComplete()``
+
+Return a promise that resolve when all the current queued call of a runExclusive functions have completed.  
+The classInstanceObject parameter is to provide only for the run-exclusive
+function created with 'buildMethod[Cb].
+
 ````typescript
-/**
- *
- * Get the number of queued call of a run-exclusive function. 
- * Note that if you call a runExclusive function and call this 
- * directly after it will return 0 as there is one function call
- * execution ongoing but 0 queued.
- * 
- * The classInstanceObject parameter is to provide only for the run-exclusive
- * function created with 'buildMethod[Cb].
- *
- * */
-export declare function getQueuedCallCount(runExclusiveFunction: Function, classInstanceObject?: Object): number;
-/**
- *
- * Cancel all queued calls of a run-exclusive function.
- * Note that the current running call will not be cancelled.
- *
- * The classInstanceObject parameter is to provide only for the run-exclusive
- * function created with 'buildMethod[Cb].
- *
- */
-export declare function cancelAllQueuedCalls(runExclusiveFunction: Function, classInstanceObject?: Object): number;
-/**
- * Tell if a run-exclusive function has an instance of it's call currently being
- * performed.
- *
- * The classInstanceObject parameter is to provide only for the run-exclusive
- * function created with 'buildMethod[Cb].
- */
-export declare function isRunning(runExclusiveFunction: Function, classInstanceObject?: Object): boolean;
-/**
- * Return a promise that resolve when all the current queued call of a runExclusive functions
- * have completed.
- *
- * The classInstanceObject parameter is to provide only for the run-exclusive
- * function created with 'buildMethod[Cb].
- */
-export declare function getPrComplete(runExclusiveFunction: Function, classInstanceObject?: Object): Promise<void>;
+export declare function getPrComplete(
+    runExclusiveFunction: Function, 
+    classInstanceObject?: Object
+): Promise<void>;
 ````
 
