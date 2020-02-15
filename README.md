@@ -192,6 +192,12 @@ bob.spell("c").then( ()=> console.log(bob.alphabet)); //prints after 3s: "abc"
 
 The only valid reason to use this instead of `build()` is to be able to retrieve the result synchronously. 
 
+<b><span style="color:red"> WARNING:</span></b> If you make the callback optional the argument before it cannot be a function.  
+Be aware that the compiler won't warn you against it.  
+Example: ``(getLetter: ()=> string, callback?: (message: string)=> voidA) => {..}``  
+is NOT a valid function to pass to ``buildCb()`` or ``buildMethodCb()``.
+*Thanks @AnyhowStep*   
+
 <b>WARNING:</b> The function should never throw as the exception wont be catchable.
 
 ````typescript

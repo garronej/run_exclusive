@@ -53,32 +53,61 @@ export declare function isRunning(runExclusiveFunction: Function, classInstanceO
  */
 export declare function getPrComplete(runExclusiveFunction: Function, classInstanceObject?: Object): Promise<void>;
 /**
+ * (Read all before using)
  *
  * The pending of 'build' for creating run exclusive functions that complete
  * via calling a callback function. (Instead of returning a promise).
  *
- * The only valid reason to use this instead of build is to be able to
- * retreave the result of a call synchronously. in the case.
+ * The only valid reason to use this instead of ``build()`` is to be able to
+ * retrieve the result and/or release the lock synchronously when it's possible.
  *
  * If you want the callback to be optional it is possible to
  * define the function as such:
+ * ``const myRunExclusiveFunction = buildCb((callback?)=> { ... });``
+ * Anyway you must call it every time and assume it has been defined:
+ * ``callback!(...)``.
  *
- * const myRunExclusiveFunction = buildCb((callback?)=> { ... });
+ * To see if the user has actually provided a callback you can access the hidden property
+ * ``callback.hasCallback``.
  *
- * But you must call it every time and assume it has been defined:
- * callback!(...);
- *
- * To see if the user has actually provided a callback you can access
- * callback.hasCallback.
+ * WARNING: You must also make sure, if you use an optional callback
+ * that the argument before it cannot be a function.
+ * Be aware that the compiler won't warn you against it.
+ * Example: ``(getLetter:()=> string, callback?:(res:string)=> void)=>{..}``
+ * is NOT a valid function to pass to ``buildCb()``
  *
  * WARNING: the source function should NEVER throw exception!
- *
  */
 export declare function buildCb<T extends (...input: any[]) => void>(fun: T): T;
 export declare function buildCb<T extends (...input: any[]) => void>(groupRef: GroupRef, fun: T): T;
 /**
+ * (Read all before using)
+ *
  * Pending of 'buildMethod' for function that return with callback instead of promise.
- * See buildCb.
+ *
+ * The pending of 'build' for creating run exclusive functions that complete
+ * via calling a callback function. (Instead of returning a promise).
+ *
+ * The only valid reason to use this instead of ``build()`` is to be able to
+ * retrieve the result and/or release the lock synchronously when it's possible.
+ *
+ * If you want the callback to be optional it is possible to
+ * define the function as such:
+ * ``const myRunExclusiveFunction = buildCb((callback?)=> { ... });``
+ * Anyway you must call it every time and assume it has been defined:
+ * ``callback!(...)``.
+ *
+ * To see if the user has actually provided a callback you can access the hidden property
+ * ``callback.hasCallback``.
+ *
+ * WARNING: You must also make sure, if you use an optional callback
+ * that the argument before it cannot be a function.
+ * Be aware that the compiler won't warn you against it.
+ * Example: ``(getLetter:()=> string, callback?:(res:string)=> void)=>{..}``
+ * is NOT a valid function to pass to ``buildMethodCb()``
+ *
+ * WARNING: the source function should NEVER throw exception!
+ *
  */
 export declare function buildMethodCb<T extends (...input: any[]) => void>(fun: T): T;
 export declare function buildMethodCb<T extends (...input: any[]) => void>(groupRef: GroupRef, fun: T): T;
