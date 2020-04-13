@@ -28,7 +28,7 @@ This is a higher-level approach to the problem addressed by [`DirtyHairy/async-m
 ## Deno
 
 ```typescript
-import * as runExclusive from "https://deno.land/x/run_eclusive/mod.ts";
+import * as runExclusive from "https://deno.land/x/run_exclusive/mod.ts";
 ```
 
 ## Other javascript runtime environnement: 
