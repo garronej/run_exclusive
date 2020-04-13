@@ -54,6 +54,6 @@ inst.myMethod("j").then( alphabet => {
     console.assert(alphabet === "aBCDEFghij");
     //cSpell: enable
 
-    console.log("PASS".green);
+    console.log("PASS");
 
 });

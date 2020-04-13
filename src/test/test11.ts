@@ -61,7 +61,7 @@ setTimeout(() => {
 
         console.assert(inst.getAlphabet() === "abc");
 
-        console.log("PASS".green);
+        console.log("PASS");
 
     }, 2000);
 

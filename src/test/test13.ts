@@ -31,7 +31,7 @@ inst.myMethod("a").then( () => {
     console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 0);
     console.assert(runExclusive.isRunning(inst.myMethod, inst) === false);
 
-    console.log("PASS".green);
+    console.log("PASS");
 
 });
 

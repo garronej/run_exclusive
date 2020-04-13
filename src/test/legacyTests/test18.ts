@@ -40,4 +40,4 @@ inst.myMethod("callback", message => console.assert("callback" === message));
 
 console.assert(success);
 
-console.log("DONE".green);
+console.log("DONE");

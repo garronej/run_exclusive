@@ -37,7 +37,7 @@ inst.myMethodStack("j", alphabet => {
     console.assert(alphabet === "abcdefghij");
     //cSpell: enable
 
-    console.log("PASS".green);
+    console.log("PASS");
 
 });
 

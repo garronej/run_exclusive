@@ -82,7 +82,7 @@ console.assert(runExclusive.getQueuedCallCount(inst.myMethod, inst) === 3);
 
         console.assert(inst.getAlphabet() === "abc");
 
-        console.log("PASS".green);
+        console.log("PASS");
 
     }, 2000);
 

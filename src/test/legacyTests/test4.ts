@@ -33,7 +33,7 @@ let rev = ["n", "m", "l", "k", "j", "i", "h", "g", "f", "e", "d", "c", "b"];
 let wait = 500;
 
 for (let char of rev)
-    inst2.myMethod(char, wait, alphabet => console.log(alphabet.blue));
+    inst2.myMethod(char, wait, alphabet => console.log(alphabet));
 inst2.myMethod("a", wait, function () {
 
     let duration = Date.now() - start;
@@ -50,7 +50,7 @@ inst2.myMethod("a", wait, function () {
     console.assert(Math.abs(duration - expectedDuration) < 300);
     console.assert(duration - expectedDuration >= 0);
 
-    console.log("PASS".green);
+    console.log("PASS");
 
 
 });

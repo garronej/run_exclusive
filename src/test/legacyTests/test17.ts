@@ -46,7 +46,7 @@ setTimeout(() => {
 
     console.assert(success);
 
-    console.log("DONE".green);
+    console.log("DONE");
 
 
 }, 2500);

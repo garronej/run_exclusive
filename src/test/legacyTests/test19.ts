@@ -48,7 +48,7 @@ let inst= new MyClass();
 
         console.assert(runCount === 3);
 
-        console.log("DONE".green);
+        console.log("DONE");
 
     }, 3100);
 

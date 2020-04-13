@@ -11,4 +11,4 @@ runExclusiveFunction(()=> cbTriggered = true );
 
 console.assert( cbTriggered );
 
-console.log("PASS".green);
+console.log("PASS");

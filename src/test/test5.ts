@@ -37,7 +37,7 @@ let rev = ["n", "m", "l", "k", "j", "i", "h", "g", "f", "e", "d", "c", "b"];
 let wait = 500;
 
 for (let char of rev)
-    inst2.myMethod.call(MyClass, char, wait).then(alphabet => console.log(alphabet.blue));
+    inst2.myMethod.call(MyClass, char, wait).then(alphabet => console.log(alphabet));
 
 inst2.myMethod.call(MyClass, "a", wait).then(function () {
 
@@ -64,6 +64,6 @@ inst1.myMethod.call(MyClass, "d", 1000).then(() => {
     console.assert(Math.abs(duration - expectedDuration) < 300);
     console.assert(duration - expectedDuration >= 0);
 
-    console.log("PASS".green);
+    console.log("PASS");
 
 });

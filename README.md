@@ -18,11 +18,27 @@ If the function is called again while there is already an execution ongoing the 
 
 This is a higher-level approach to the problem addressed by [`DirtyHairy/async-mutex`](https://www.npmjs.com/package/async-mutex).    
 
-<b>Browserify friendly:</b>
+<b>Suitable for any JS runtime env (deno, node, old browser, react-native ...)</b>
+- No polyfills needed, transpile down to ES3 ✅  
+- Ultra light, no dependency ✅  
+- Cross compatible node/deno
 
-- No polyfills needed ✅  
-- Transpiled down to ES3 ✅  
-- Ultra light ✅  
+# Install / Import
+
+## Deno
+
+```typescript
+import * as runExclusive from "https://deno.land/x/run-eclusive/mod.ts";
+```
+
+## Other javascript runtime environnement: 
+
+```bash
+> npm install --save run-exclusive
+```
+```typescript
+import * as runExclusive from "run-exclusive";
+```
 
 # Try it now
 
