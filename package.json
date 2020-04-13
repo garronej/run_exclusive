@@ -1,20 +1,28 @@
 {
     "name": "run-exclusive",
-    "version": "2.1.8",
+    "version": "2.1.13",
     "description": "Generate functions that do not allow parallel executions",
     "repository": {
         "type": "git",
-        "url": "git://github.com/garronej/run-exclusive.git"
+        "url": "git://github.com/garronej/run_exclusive.git"
     },
     "main": "./dist/lib/runExclusive.js",
     "types": "./dist/lib/runExclusive.d.ts",
     "scripts": {
+        "test:node": "node ./dist/test",
+        "test:deno": "deno run ./deno_dist/test/deno_index.ts",
+        "test": "npm run test:node && npm run test:deno",
         "tsc": "npx tsc",
         "denoify": "npx denoify",
-        "build": "npm run tsc && npm run denoify",
-        "test": "node ./dist/test/index"
+        "cdn:.js": "simplifyify dist/lib/runExclusive.js -s run_exclusive -o dist/umd_bundle.js --debug --bundle",
+        "cdn:.min.js": "terser dist/umd_bundle.js -cmo dist/umd_bundle.min.js",
+        "cdn": "npm run cdn:.js && npm run cdn:.min.js",
+        "build": "npm run tsc && npm run denoify && npm run cdn",
+        "enable_short_import_path:npm": "npm run build && npx denoify_enable_short_npm_import_path",
+        "enable_short_import_path:deno": "npm run build && npx denoify_enable_short_deno_import_path",
+        "clean": "rm -rf dist deno_dist node_modules mod.ts"
     },
-    "author": "Joseph Garrone",
+    "author": "u/garronej",
     "license": "MIT",
     "keywords": [
         "deno",
@@ -26,22 +34,21 @@
         "typescript",
         "type-safe"
     ],
-    "homepage": "https://garronej.github.io/run-exclusive",
+    "homepage": "https://garronej.github.io/run_exclusive",
     "dependencies": {
-        "minimal-polyfills": "^1.0.3"
+        "minimal-polyfills": "^2.0.1"
     },
     "devDependencies": {
         "@types/node": "^10.3.2",
         "ts-evt": "^4.3.3",
-        "typescript": "^2.9.1",
-        "denoify": "github:garronej/denoify"
+        "typescript": "^3.9.0",
+        "denoify": "^0.2.11",
+        "simplifyify": "8.0.1",
+        "terser": "4.6.13"
     },
     "files": [
         "/dist/lib",
         "/src/lib",
         "/tsconfig.json"
-      ],
-    "deno": {
-        "url": "https://deno.land/x/run_eclusive/mod.ts"
-    }
+    ]
 }

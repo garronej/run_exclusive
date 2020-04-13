@@ -11,7 +11,7 @@ class MyClass{
     public myMethodUpperCase = runExclusive.buildMethod(this.groupRefAlphabet,
         async (char: string ): Promise<string> => {
 
-            await new Promise<void>(resolve=> setTimeout(resolve, Math.random()*1000));
+            await new Promise<void>(resolve=> setTimeout(()=>resolve(), Math.random()*1000));
 
             this.alphabetStack += char.toUpperCase();
 
@@ -23,7 +23,7 @@ class MyClass{
     public myMethod = runExclusive.buildMethod(this.groupRefAlphabet,
         async (char: string ): Promise<string> => {
 
-            await new Promise<void>(resolve=> setTimeout(resolve, Math.random()*1000));
+            await new Promise<void>(resolve=> setTimeout(()=>resolve(), Math.random()*1000));
 
             this.alphabetStack += char;
 

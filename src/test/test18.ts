@@ -17,6 +17,7 @@ const myFunction = runExclusive.build(
 
 
     myFunction("a");
+    
     myFunction("b");
 
     runExclusive.getPrComplete(myFunction).then(()=> { 

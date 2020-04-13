@@ -52,7 +52,7 @@ let wait = 500;
 
 for (let char of rev)
     inst.myMethod2(char, wait, alphabet => console.log(alphabet));
-inst.myMethod2("a", wait, function () {
+inst.myMethod2("a", wait, function (this: any) {
 
     let duration = Date.now() - start;
 

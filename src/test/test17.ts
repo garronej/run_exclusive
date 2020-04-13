@@ -11,7 +11,7 @@ export class MyClass {
     public myMethod = runExclusive.buildMethod(
         async (input: number): Promise<string> => {
 
-            await new Promise<void>(resolve => setTimeout(resolve, 1000));
+            await new Promise<void>(resolve => setTimeout(()=>resolve(), 1000));
 
             runCount++;
 

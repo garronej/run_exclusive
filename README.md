@@ -19,44 +19,48 @@ If the function is called again while there is already an execution ongoing the 
 This is a higher-level approach to the problem addressed by [`DirtyHairy/async-mutex`](https://www.npmjs.com/package/async-mutex).    
 
 <b>Suitable for any JS runtime env (deno, node, old browser, react-native ...)</b>
-- No polyfills needed, transpile down to ES3 ✅  
-- Ultra light, no dependency ✅  
-- Cross compatible node/deno
+- ✅ No polyfills needed, transpile down to ES3   
+- ✅ Ultra light, no dependency   
+- ✅ Cross compatible node/deno 
 
 # Install / Import
 
 ## Deno
 
 ```typescript
-import * as runExclusive from "https://deno.land/x/run_eclusive/mod.ts";
+import * as runExclusive from "https://deno.land/x/run_exclusive/mod.ts";
 ```
 
 ## Other javascript runtime environnement: 
 
 ```bash
-> npm install --save run-exclusive
+$ npm install --save run-exclusive
 ```
 ```typescript
 import * as runExclusive from "run-exclusive";
+```
+
+## Import from HTML, with CDN
+
+Expose a global (wider browser support):  
+
+```html
+<script src="//unpkg.com/run_exclusive/umd_bundle.min.js"></script>
+<script>
+  run_exclusive.build(...);
+</script>
 ```
 
 # Try it now
 
 Thanks to Stackblitz you can try this lib within your browser like if you where in VSCode. 
 
-<p align="center">
-    <img src="https://user-images.githubusercontent.com/6702424/74528376-70531280-4f28-11ea-9545-46d258b74454.png">  
-</p>
+![Screenshot 2020-02-14 at 12 48 04](https://user-images.githubusercontent.com/6702424/74528376-70531280-4f28-11ea-9545-46d258b74454.png)
 
 [__Run the example__](https://stackblitz.com/edit/run-exclusive-hello-world?embed=1&file=index.ts)
 
 # Table of content
 
-- [Install / Import](#install--import)
-  - [Deno](#deno)
-  - [Other javascript runtime environnement:](#other-javascript-runtime-environnement)
-- [Try it now](#try-it-now)
-- [Table of content](#table-of-content)
 - [Documentation](#documentation)
   - [``build()``](#build)
   - [``createGroupRef()``](#creategroupref)

@@ -10,7 +10,7 @@ class MyClass {
     public myMethod = runExclusive.buildMethod(
         async (char: string): Promise<string> => {
 
-            await new Promise<void>(resolve => setTimeout(resolve, 1000));
+            await new Promise<void>(resolve => setTimeout(()=>resolve(), 1000));
 
             this.alphabet += char;
 
