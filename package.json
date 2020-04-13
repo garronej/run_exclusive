@@ -1,10 +1,10 @@
 {
     "name": "run-exclusive",
-    "version": "2.1.8",
+    "version": "2.1.9",
     "description": "Generate functions that do not allow parallel executions",
     "repository": {
         "type": "git",
-        "url": "git://github.com/garronej/run-exclusive.git"
+        "url": "git://github.com/garronej/run_exclusive.git"
     },
     "main": "./dist/lib/runExclusive.js",
     "types": "./dist/lib/runExclusive.d.ts",
@@ -26,7 +26,7 @@
         "typescript",
         "type-safe"
     ],
-    "homepage": "https://garronej.github.io/run-exclusive",
+    "homepage": "https://garronej.github.io/run_exclusive",
     "dependencies": {
         "minimal-polyfills": "^1.0.3"
     },
@@ -40,7 +40,7 @@
         "/dist/lib",
         "/src/lib",
         "/tsconfig.json"
-      ],
+    ],
     "deno": {
         "url": "https://deno.land/x/run_eclusive/mod.ts"
     }
