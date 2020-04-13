@@ -28,7 +28,7 @@ This is a higher-level approach to the problem addressed by [`DirtyHairy/async-m
 ## Deno
 
 ```typescript
-import * as runExclusive from "https://deno.land/x/run-eclusive/mod.ts";
+import * as runExclusive from "https://deno.land/x/run_eclusive/mod.ts";
 ```
 
 ## Other javascript runtime environnement: 
@@ -52,6 +52,9 @@ Thanks to Stackblitz you can try this lib within your browser like if you where 
 
 # Table of content
 
+- [Install / Import](#install--import)
+  - [Deno](#deno)
+  - [Other javascript runtime environnement:](#other-javascript-runtime-environnement)
 - [Try it now](#try-it-now)
 - [Table of content](#table-of-content)
 - [Documentation](#documentation)
