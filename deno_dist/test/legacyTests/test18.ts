@@ -1,5 +1,5 @@
 import * as runExclusive from "../../lib/runExclusive.ts";
-import {  Evt } from "ts-evt (unmet dev dependency)";
+import {  Evt } from "ts-evt DENOIFY: DEPENDENCY UNMET (DEV DEPENDENCY)";
 
 export class MyClass {
 

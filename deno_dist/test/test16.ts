@@ -9,7 +9,7 @@ export class MyClass{
     public myMethod = runExclusive.buildMethod(
         async (input: string): Promise<[string, number]> => {
 
-            await new Promise<void>(resolve=> setTimeout(resolve, 1000));
+            await new Promise<void>(resolve=> setTimeout(()=>resolve(), 1000));
 
             runCount++;
 

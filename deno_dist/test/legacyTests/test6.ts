@@ -60,7 +60,7 @@ for (let char of rev){
     inst2.myMethod(char, wait, alphabet => console.log(alphabet));
 }
 
-inst2.myMethod("a", wait, function () {
+inst2.myMethod("a", wait, function (this: any) {
 
     //cSpell: disable
     console.assert(this.alphabet === "nmlkjihgfedcba");

@@ -11,7 +11,7 @@ class MyClass1 {
     public myMethod = runExclusive.build(groupRefAlphabet,
         async (char: string, wait: number): Promise<string> => {
 
-            await new Promise<void>(resolve => setTimeout(resolve, wait));
+            await new Promise<void>(resolve => setTimeout(()=>resolve(), wait));
 
             this.alphabet += char.toUpperCase();
 
@@ -30,7 +30,7 @@ class MyClass2 {
     public myMethod = runExclusive.build(groupRefAlphabet,
         async (char: string, wait: number): Promise<string> => {
 
-            await new Promise<void>(resolve => setTimeout(resolve, wait));
+            await new Promise<void>(resolve => setTimeout(()=>resolve(), wait));
 
             this.alphabet += char;
 

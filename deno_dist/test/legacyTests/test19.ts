@@ -29,7 +29,7 @@ let inst= new MyClass();
 (async()=> {
 
     let [ out1, out2 ]= await new Promise<[string, number]>(
-        resolve=> inst.myMethod("yo", (out1, out2)=> [ out1, out2 ])
+        resolve=> inst.myMethod("yo", (out1, out2)=> resolve([ out1, out2 ]))
     );
 
     console.assert(out1 === "yo 0K" && out2 === 666 );

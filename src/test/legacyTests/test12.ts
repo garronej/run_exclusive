@@ -44,7 +44,7 @@ export class MyClassProxy {
     }
 
     public myMethod = runExclusive.buildMethodCb(
-        function callee(...inputs) {
+        function callee(this: any, ...inputs) {
 
             let self = this as MyClassProxy;
 

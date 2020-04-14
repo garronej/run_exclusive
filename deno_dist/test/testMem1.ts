@@ -5,7 +5,7 @@ function print_mem() {
 
     const used = process.memoryUsage();
     for (let key in used) {
-        console.log(`${key} ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
+        console.log(`${key} ${Math.round((used as any)[key] / 1024 / 1024 * 100) / 100} MB`);
     }
 
 }

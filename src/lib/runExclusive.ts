@@ -204,7 +204,7 @@ function buildFnPromise<T extends (...inputs: any[]) => Promise<any>>(
 
     let execQueue: ExecQueue;
 
-    const runExclusiveFunction = (function (...inputs) {
+    const runExclusiveFunction = (function (this: any, ...inputs) {
 
         if (!isGlobal) {
 
@@ -242,7 +242,7 @@ function buildFnPromise<T extends (...inputs: any[]) => Promise<any>>(
 
             };
 
-            (function callee(...inputs) {
+            (function callee(this: any,...inputs: any[]) {
 
                 if (execQueue.isRunning) {
                     execQueue.queuedCalls.push(() => callee.apply(this, inputs));
@@ -367,7 +367,7 @@ function buildFnCallback<T extends (...inputs: any[]) => Promise<any>>(
 
     let execQueue: ExecQueue;
 
-    const runExclusiveFunction = (function (...inputs) {
+    const runExclusiveFunction = (function (this: any,...inputs) {
 
 
         if (!isGlobal) {
@@ -392,7 +392,7 @@ function buildFnCallback<T extends (...inputs: any[]) => Promise<any>>(
             onPrCompleteResolve = () => resolve()
         );
 
-        const onComplete = (...inputs) => {
+        const onComplete = (...inputs: any[]) => {
             
             onPrCompleteResolve();
 
@@ -410,7 +410,7 @@ function buildFnCallback<T extends (...inputs: any[]) => Promise<any>>(
 
         (onComplete as any).hasCallback = !!callback;
 
-        (function callee(...inputs) {
+        (function callee(this: any, ...inputs: any[]) {
 
             if (execQueue.isRunning) {
                 execQueue.queuedCalls.push(() => callee.apply(this, inputs));

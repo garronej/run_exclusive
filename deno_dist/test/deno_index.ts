@@ -1,4 +1,8 @@
 
+declare const console: any;
+
+console.log("DENO TEST");
+
 import "./test1.ts";
 import "./test2.ts";
 import "./test3.ts";

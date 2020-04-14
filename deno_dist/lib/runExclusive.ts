@@ -1,5 +1,5 @@
 
-import { Polyfill as WeakMap } from "https://raw.githubusercontent.com/garronej/minimal-polyfills/d2042faae110b311d0e12233f1cd9bb31eb1ae86/deno_dist/lib/WeakMap.ts";
+import { Polyfill as WeakMap } from "https://raw.githubusercontent.com/garronej/minimal_polyfills/b7ed952522d45b96c8fb8751f14ea6e88dc595a3/deno_dist/lib/WeakMap.ts";
 
 class ExecQueue {
 
@@ -204,7 +204,7 @@ function buildFnPromise<T extends (...inputs: any[]) => Promise<any>>(
 
     let execQueue: ExecQueue;
 
-    const runExclusiveFunction = (function (...inputs) {
+    const runExclusiveFunction = (function (this: any, ...inputs) {
 
         if (!isGlobal) {
 
@@ -242,7 +242,7 @@ function buildFnPromise<T extends (...inputs: any[]) => Promise<any>>(
 
             };
 
-            (function callee(...inputs) {
+            (function callee(this: any,...inputs: any[]) {
 
                 if (execQueue.isRunning) {
                     execQueue.queuedCalls.push(() => callee.apply(this, inputs));
@@ -367,7 +367,7 @@ function buildFnCallback<T extends (...inputs: any[]) => Promise<any>>(
 
     let execQueue: ExecQueue;
 
-    const runExclusiveFunction = (function (...inputs) {
+    const runExclusiveFunction = (function (this: any,...inputs) {
 
 
         if (!isGlobal) {
@@ -392,7 +392,7 @@ function buildFnCallback<T extends (...inputs: any[]) => Promise<any>>(
             onPrCompleteResolve = () => resolve()
         );
 
-        const onComplete = (...inputs) => {
+        const onComplete = (...inputs: any[]) => {
             
             onPrCompleteResolve();
 
@@ -410,7 +410,7 @@ function buildFnCallback<T extends (...inputs: any[]) => Promise<any>>(
 
         (onComplete as any).hasCallback = !!callback;
 
-        (function callee(...inputs) {
+        (function callee(this: any, ...inputs: any[]) {
 
             if (execQueue.isRunning) {
                 execQueue.queuedCalls.push(() => callee.apply(this, inputs));

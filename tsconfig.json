@@ -1,25 +1,27 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "es3",
-        "lib": [
-            "es5",
-            "es2015"
-        ],
-        "declaration": true,
-        "outDir": "./dist",
-        "strictNullChecks": true,
-        "sourceMap": false,
-        "newLine": "LF",
-        "downlevelIteration": true
-    },
-    "filesGlob": [
-        "src/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist/**/*",
-        "deno_dist/**/*",
-        "./mod.ts"
-    ]
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es3",
+		"lib": [
+			"es5",
+			"es2015"
+		],
+		"declaration": true,
+		"outDir": "./dist",
+		"sourceMap": true,
+		"newLine": "LF",
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"incremental": true,
+		"strict": true
+	},
+	"filesGlob": [
+		"src/**/*"
+	],
+	"exclude": [
+		"node_modules",
+		"dist/**/*",
+		"deno_dist/**/*",
+		"./mod.ts"
+	]
 }
