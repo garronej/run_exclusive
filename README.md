@@ -60,12 +60,6 @@ Thanks to Stackblitz you can try this lib within your browser like if you where 
 
 # Table of content
 
-- [Install / Import](#install--import)
-  - [Deno](#deno)
-  - [Other javascript runtime environnement:](#other-javascript-runtime-environnement)
-  - [Import from HTML, with CDN](#import-from-html-with-cdn)
-- [Try it now](#try-it-now)
-- [Table of content](#table-of-content)
 - [Documentation](#documentation)
   - [``build()``](#build)
   - [``createGroupRef()``](#creategroupref)
