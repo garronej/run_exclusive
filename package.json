@@ -47,8 +47,6 @@
         "terser": "4.6.13"
     },
     "files": [
-        "/dist/lib",
-        "/src/lib",
-        "/tsconfig.json"
+        "/dist/lib"
     ]
 }

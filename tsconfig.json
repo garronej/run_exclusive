@@ -8,7 +8,7 @@
 		],
 		"declaration": true,
 		"outDir": "./dist",
-		"sourceMap": true,
+		"sourceMap": false,
 		"newLine": "LF",
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
@@ -22,6 +22,6 @@
 		"node_modules",
 		"dist/**/*",
 		"deno_dist/**/*",
-		"./mod.ts"
+		"mod.ts"
 	]
 }
