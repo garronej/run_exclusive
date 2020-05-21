@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/6702424/82566454-3a9f7480-9b7c-11ea-8120-d0141c66c430.png">  
+    <img src="https://user-images.githubusercontent.com/6702424/74085997-1d3c1400-4a7f-11ea-9abf-81a4352f827f.png">  
 </p>
 <p align="center">
     ⚡🔒 <i> Generate functions that do not allow parallel executions</i> 🔒 ⚡
@@ -44,7 +44,7 @@ import * as runExclusive from "run-exclusive";
 Expose a global (wider browser support):  
 
 ```html
-<script src="//unpkg.com/run_exclusive/umd_bundle.min.js"></script>
+<script src="//unpkg.com/run-exclusive/umd_bundle.min.js"></script>
 <script>
   run_exclusive.build(...);
 </script>
@@ -60,6 +60,12 @@ Thanks to Stackblitz you can try this lib within your browser like if you where 
 
 # Table of content
 
+- [Install / Import](#install--import)
+  - [Deno](#deno)
+  - [Other javascript runtime environnement:](#other-javascript-runtime-environnement)
+  - [Import from HTML, with CDN](#import-from-html-with-cdn)
+- [Try it now](#try-it-now)
+- [Table of content](#table-of-content)
 - [Documentation](#documentation)
   - [``build()``](#build)
   - [``createGroupRef()``](#creategroupref)

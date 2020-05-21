@@ -1,6 +1,6 @@
 {
     "name": "run-exclusive",
-    "version": "2.1.14",
+    "version": "2.1.15",
     "description": "Generate functions that do not allow parallel executions",
     "repository": {
         "type": "git",
@@ -47,6 +47,7 @@
         "terser": "4.6.13"
     },
     "files": [
+        "/dist/*.{d.ts,js,js.map}",
         "/dist/lib"
     ]
 }
