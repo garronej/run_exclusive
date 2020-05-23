@@ -1,3 +1,7 @@
+### **2.2.4** (2020-05-23)  
+  
+- Fix links    
+  
 ### **2.2.3** (2020-05-23)  
   
 - Use mod.ts instead of deno_index.ts to align with conventions  
