@@ -1,3 +1,8 @@
+### **2.2.3** (2020-05-23)  
+  
+- Use mod.ts instead of deno_index.ts to align with conventions  
+- Re-enable source map generation    
+  
 ### **2.2.2** (2020-05-23)  
   
 - Minor readme changes    
