@@ -46,7 +46,7 @@ Expose a global (wider browser support):
 ```html
 <script src="//unpkg.com/run-exclusive/umd_bundle.min.js"></script>
 <script>
-  run_exclusive.build(...);
+  runExclusive.build(...);
 </script>
 ```
 

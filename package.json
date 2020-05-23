@@ -14,7 +14,7 @@
         "test": "npm run test:node && npm run test:deno",
         "tsc": "npx tsc",
         "denoify": "npx denoify",
-        "cdn:.js": "simplifyify dist/lib/runExclusive.js -s run_exclusive -o dist/umd_bundle.js --debug --bundle",
+        "cdn:.js": "simplifyify dist/lib/runExclusive.js -s runExclusive -o dist/umd_bundle.js --debug --bundle",
         "cdn:.min.js": "terser dist/umd_bundle.js -cmo dist/umd_bundle.min.js",
         "cdn": "npm run cdn:.js && npm run cdn:.min.js",
         "build": "npm run tsc && npm run denoify && npm run cdn",
