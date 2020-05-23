@@ -1,3 +1,9 @@
+## **2.2.0** (2020-05-23)  
+  
+- Global exposed by CDN build changed from run_exclusive to runExclusive for consistency  
+- Fix source map. Go to definition redirect to source .ts file ( instead of .d.ts)  
+- Adding CI badge    
+  
 ### **2.1.18** (2020-05-21)  
   
 - include CDN build    
