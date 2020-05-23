@@ -36,18 +36,19 @@
     ],
     "homepage": "https://garronej.github.io/run_exclusive",
     "dependencies": {
-        "minimal-polyfills": "^2.0.1"
+        "minimal-polyfills": "^2.1.0"
     },
     "devDependencies": {
         "@types/node": "^10.3.2",
         "ts-evt": "^4.3.3",
         "typescript": "^3.9.0",
-        "denoify": "^0.2.11",
+        "denoify": "^0.2.13",
         "simplifyify": "8.0.1",
         "terser": "4.6.13"
     },
     "files": [
+        "/src/",
         "/dist/*.{d.ts,js,js.map}",
-        "/dist/lib"
+        "/dist/lib/"
     ]
 }
