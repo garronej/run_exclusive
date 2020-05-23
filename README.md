@@ -7,7 +7,6 @@
     <br>
     <img src="https://github.com/garronej/run_exclusive/workflows/ci/badge.svg?branch=develop">
     <img src="https://img.shields.io/bundlephobia/minzip/run-exclusive">
-    <img src="https://img.shields.io/david/garronej/run-exclusive">
     <img src="https://img.shields.io/npm/l/run-exclusive">
 </p>  
 
