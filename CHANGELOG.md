@@ -1,3 +1,7 @@
+## **2.2.1** (2020-05-23)  
+  
+- Minor readme changes    
+  
 ## **2.2.0** (2020-05-23)  
   
 - Global exposed by CDN build changed from run_exclusive to runExclusive for consistency  
