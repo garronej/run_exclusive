@@ -18,9 +18,9 @@ If the function is called again while there is already an execution ongoing the 
 This is a higher-level approach to the problem addressed by [`DirtyHairy/async-mutex`](https://www.npmjs.com/package/async-mutex).    
 
 <b>Suitable for any JS runtime env (deno, node, old browser, react-native ...)</b>
-- ✅ No polyfills needed, transpile down to ES3   
-- ✅ Ultra light, no dependency   
-- ✅ Cross compatible node/deno 
+- ✅ It is both a [Deno](https://deno.land/x/evt) and an [NPM](https://www.npmjs.com/evt) module. 
+- ✅ Lightweight, no dependency.
+- ✅ No polyfills needed, the NPM module is transpiled down to ES3   
 
 # Install / Import
 
