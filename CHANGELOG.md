@@ -1,3 +1,7 @@
+### **2.2.2** (2020-05-23)  
+  
+- Minor readme changes    
+  
 ## **2.2.1** (2020-05-23)  
   
 - Minor readme changes    
