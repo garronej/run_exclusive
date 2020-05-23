@@ -96,6 +96,19 @@ jobs:
       with:
         github_token: ${{ secrets.PAT }}
         branch: master
+    - name: Release body
+      id: id_rb
+      run: |
+        if [ "$FROM_VERSION" = "" ]; then
+            echo "::set-output name=body::🚀"
+        else
+            echo "::set-output name=body::📋 [CHANGELOG](https://github.com/$OWNER/$REPO/blob/$REF/CHANGELOG.md)"
+        fi
+      env: 
+        FROM_VERSION: ${{ github.event.client_payload.from_version }}
+        OWNER: ${{github.repository_owner}}
+        REPO: ${{github.event.client_payload.repo}}
+        REF: ${{github.event.client_payload.to_version}}
     - name: Create Release
       uses: garronej/create-release@master
       env:
@@ -106,7 +119,4 @@ jobs:
         branch: master
         draft: false
         prerelease: false
-
-         
-         
-
+        body: ${{ steps.id_rb.outputs.body }}
