@@ -14,11 +14,11 @@
         "test": "npm run test:node && npm run test:deno",
         "tsc": "npx tsc",
         "denoify": "npx denoify",
-        "cdn:.js": "simplifyify dist/lib/runExclusive.js -s runExclusive -o dist/umd_bundle.js --debug --bundle",
-        "cdn:.min.js": "terser dist/umd_bundle.js -cmo dist/umd_bundle.min.js",
+        "cdn:.js": "simplifyify dist/lib/runExclusive.js -s runExclusive -o dist/bundle.js --debug --bundle",
+        "cdn:.min.js": "terser dist/bundle.js -cmo dist/bundle.min.js",
         "cdn": "npm run cdn:.js && npm run cdn:.min.js",
         "build": "npm run tsc && npm run denoify && npm run cdn",
-        "enable_short_import_path:npm": "npm run build && npx denoify_enable_short_npm_import_path",
+        "enable_short_import_path:npm": "npm run build && npx denoify_enable_short_npm_import_path --.ts_alongside_.js=true",
         "enable_short_import_path:deno": "npm run build && npx denoify_enable_short_deno_import_path",
         "clean": "rm -rf dist deno_dist node_modules mod.ts"
     },
@@ -41,14 +41,14 @@
     "devDependencies": {
         "@types/node": "^10.3.2",
         "ts-evt": "^4.3.3",
-        "typescript": "^3.9.0",
-        "denoify": "^0.2.13",
+        "typescript": "^3.9.3",
+        "denoify": "^0.2.14",
         "simplifyify": "8.0.1",
         "terser": "4.6.13"
     },
     "files": [
-        "/src/",
-        "/dist/*.{d.ts,js,js.map}",
-        "/dist/lib/"
+        "/dist/lib/",
+        "/dist/bundle.{js,js.map}",
+        "/src/lib/"
     ]
 }
