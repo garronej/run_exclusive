@@ -48,7 +48,7 @@
     },
     "files": [
         "/dist/lib/",
-        "/dist/bundle.{js,js.map}",
+        "/dist/bundle.{js,js.map,min.js}",
         "/src/lib/"
     ]
 }
