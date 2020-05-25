@@ -44,11 +44,13 @@ import * as runExclusive from "run-exclusive";
 Expose a global (wider browser support):  
 
 ```html
-<script src="//unpkg.com/run-exclusive/umd_bundle.min.js"></script>
+<script src="//unpkg.com/run-exclusive/bundle.min.js"></script>
 <script>
   runExclusive.build(...);
 </script>
 ```
+
+*You can import a specific version* [unpkg.com](https://unpkg.com)
 
 # Try it now
 
