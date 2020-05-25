@@ -1,3 +1,8 @@
+### **2.2.6** (2020-05-25)  
+  
+- Include minified CDN build  
+- Fix link in readme    
+  
 ### **2.2.5** (2020-05-25)  
   
 - update dep depencencies  
