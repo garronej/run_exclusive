@@ -1,3 +1,7 @@
+### **2.2.8** (2020-07-19)  
+  
+- Support --isolatedModules flag    
+  
 ### **2.2.7** (2020-05-25)  
   
 - FIX: Go to definition redirect to source .ts file ( instead of .d.ts )    
