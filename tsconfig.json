@@ -13,7 +13,8 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"incremental": true,
-		"strict": true
+		"strict": true,
+		"isolatedModules": true
 	},
 	"filesGlob": [
 		"src/**/*"
