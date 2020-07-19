@@ -1,3 +1,7 @@
+### **2.2.7** (2020-05-25)  
+  
+- FIX: Go to definition redirect to source .ts file ( instead of .d.ts )    
+  
 ### **2.2.6** (2020-05-25)  
   
 - Include minified CDN build  
