@@ -1,3 +1,7 @@
+### **2.2.9** (2020-08-05)  
+  
+- Switch back to tag version name prefixed with 'v'    
+  
 ### **2.2.8** (2020-07-19)  
   
 - Support --isolatedModules flag    
