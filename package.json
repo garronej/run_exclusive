@@ -1,6 +1,6 @@
 {
     "name": "run-exclusive",
-    "version": "2.2.8",
+    "version": "2.2.9",
     "description": "Generate functions that do not allow parallel executions",
     "repository": {
         "type": "git",
@@ -42,7 +42,7 @@
         "@types/node": "^10.3.2",
         "ts-evt": "^4.3.3",
         "typescript": "^3.9.7",
-        "denoify": "^0.3.3",
+        "denoify": "^0.3.6",
         "simplifyify": "8.0.1",
         "terser": "4.6.13"
     },
