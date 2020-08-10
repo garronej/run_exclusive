@@ -1,6 +1,6 @@
 {
     "name": "run-exclusive",
-    "version": "2.2.11",
+    "version": "2.2.12",
     "description": "Generate functions that do not allow parallel executions",
     "repository": {
         "type": "git",
