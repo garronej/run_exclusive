@@ -1,3 +1,10 @@
+### **2.2.11** (2020-08-10)  
+  
+- merge dependabot PR  
+- Merge pull request #3 from garronej/dependabot/npm_and_yarn/lodash-4.17.19
+
+Bump lodash from 4.17.15 to 4.17.19    
+  
 ### **2.2.9** (2020-08-05)  
   
 - Switch back to tag version name prefixed with 'v'    
