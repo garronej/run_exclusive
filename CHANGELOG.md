@@ -1,3 +1,7 @@
+### **2.2.12** (2020-08-10)  
+  
+- Re-publish for deno.land/x (nothing changed)    
+  
 ### **2.2.11** (2020-08-10)  
   
 - merge dependabot PR  
