@@ -6,20 +6,8 @@
         "type": "git",
         "url": "git://github.com/garronej/run_exclusive.git"
     },
-    "main": "./dist/lib/runExclusive.js",
-    "types": "./src/lib/runExclusive.ts",
-    "scripts": {
-        "test:node": "node ./dist/test",
-        "test:deno": "deno run --reload ./deno_dist/test/mod.ts",
-        "test": "npm run test:node && npm run test:deno",
-        "tsc": "npx tsc",
-        "denoify": "npx denoify",
-        "cdn:.js": "simplifyify dist/lib/runExclusive.js -s runExclusive -o dist/bundle.js --debug --bundle",
-        "cdn:.min.js": "terser dist/bundle.js -cmo dist/bundle.min.js",
-        "cdn": "npm run cdn:.js && npm run cdn:.min.js",
-        "build": "tsc && denoify && npm run cdn",
-        "enable_short_import_path": "npm run build && npx denoify_enable_short_npm_import_path"
-    },
+    "main": "lib/runExclusive.js",
+    "types": "lib/runExclusive.ts",
     "author": "u/garronej",
     "license": "MIT",
     "keywords": [
@@ -45,8 +33,12 @@
         "terser": "4.6.13"
     },
     "files": [
-        "/dist/lib/",
-        "/dist/bundle.{js,js.map,min.js}",
-        "/src/lib/"
+        "lib/runExclusive.d.ts",
+        "lib/runExclusive.js",
+        "lib/runExclusive.js.map",
+        "bundle.js",
+        "bundle.js.map",
+        "bundle.min.js",
+        "lib/runExclusive.ts"
     ]
 }
