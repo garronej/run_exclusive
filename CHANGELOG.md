@@ -1,3 +1,7 @@
+### **2.2.14** (2020-08-27)  
+  
+- Do not use .ts files as types definition, use .d.ts files instead #4    
+  
 ### **2.2.12** (2020-08-10)  
   
 - Re-publish for deno.land/x, again (nothing changed)    
