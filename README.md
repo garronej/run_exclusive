@@ -318,4 +318,3 @@ export declare function getPrComplete(
     classInstanceObject?: Object
 ): Promise<void>;
 ````
-
