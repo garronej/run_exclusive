@@ -5,9 +5,18 @@
     ⚡🔒 <i> Generate functions that do not allow parallel executions</i> 🔒 ⚡
     <br>
     <br>
-    <img src="https://github.com/garronej/run_exclusive/workflows/ci/badge.svg?branch=develop">
-    <img src="https://img.shields.io/bundlephobia/minzip/run-exclusive">
-    <img src="https://img.shields.io/npm/l/run-exclusive">
+    <a href="https://github.com/garronej/run-exclusive/actions">
+      <img src="https://github.com/garronej/run_exclusive/workflows/ci/badge.svg?branch=develop">
+    </a>
+    <a href="https://bundlephobia.com/package/run-exclusive">
+      <img src="https://img.shields.io/bundlephobia/minzip/run-exclusive">
+    </a>
+    <a href="https://www.npmjs.com/package/run-exclusive">
+      <img src="https://img.shields.io/npm/dw/run-exclusive">
+    </a>
+    <a href="https://github.com/garronej/run-exclusive/blob/main/LICENSE">
+      <img src="https://img.shields.io/npm/l/run-exclusive">
+    </a>
 </p>  
 
 ---
@@ -62,6 +71,12 @@ Thanks to Stackblitz you can try this lib within your browser like if you where 
 
 # Table of content
 
+- [Install / Import](#install--import)
+  - [Deno](#deno)
+  - [Other javascript runtime environnement:](#other-javascript-runtime-environnement)
+  - [Import from HTML, with CDN](#import-from-html-with-cdn)
+- [Try it now](#try-it-now)
+- [Table of content](#table-of-content)
 - [Documentation](#documentation)
   - [``build()``](#build)
   - [``createGroupRef()``](#creategroupref)
