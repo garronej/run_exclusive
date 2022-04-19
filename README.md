@@ -14,6 +14,9 @@
     <a href="https://www.npmjs.com/package/run-exclusive">
       <img src="https://img.shields.io/npm/dw/run-exclusive">
     </a>
+    <a href="https://deno.land/x/run_exclusive">
+        <img src="https://img.shields.io/badge/deno-module-informational?logo=deno">
+    </a>
     <a href="https://github.com/garronej/run-exclusive/blob/main/LICENSE">
       <img src="https://img.shields.io/npm/l/run-exclusive">
     </a>
