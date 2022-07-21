@@ -42,7 +42,7 @@
         "typescript": "^3.9.7",
         "denoify": "^0.4.1",
         "simplifyify": "8.0.1",
-        "terser": "4.6.13"
+        "terser": "4.8.1"
     },
     "files": [
         "/dist/lib/",
