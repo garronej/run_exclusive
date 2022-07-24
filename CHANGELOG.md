@@ -1,3 +1,50 @@
+### **2.2.15** (2022-07-24)  
+  
+- Update dependency minimal-polyfills to ^2.2.1  
+- Merge pull request #19 from garronej/renovate_npm-minimist-vulnerability
+
+Update dependency minimist [SECURITY]  
+- Merge pull request #18 from garronej/renovate_npm-glob-parent-vulnerability
+
+Update dependency glob-parent to 5.1.2 [SECURITY]  
+- Update dependency minimist [SECURITY]  
+- Update dependency glob-parent to 5.1.2 [SECURITY]  
+- Merge pull request #16 from garronej/renovate/configure
+
+Configure Renovate  
+- Update renovate.json  
+- Add renovate.json  
+- Merge pull request #15 from garronej/dependabot/npm_and_yarn/terser-4.8.1
+
+Bump terser from 4.6.13 to 4.8.1  
+- Merge pull request #9 from garronej/dependabot/npm_and_yarn/shelljs-0.8.5
+
+Bump shelljs from 0.8.4 to 0.8.5  
+- Update README.md  
+- Merge pull request #7 from garronej/dependabot/npm_and_yarn/elliptic-6.5.4
+
+Bump elliptic from 6.5.3 to 6.5.4  
+- Bump elliptic from 6.5.3 to 6.5.4
+
+Bumps [elliptic](https://github.com/indutny/elliptic) from 6.5.3 to 6.5.4.
+- [Release notes](https://github.com/indutny/elliptic/releases)
+- [Commits](https://github.com/indutny/elliptic/compare/v6.5.3...v6.5.4)
+
+Signed-off-by: dependabot[bot] <support@github.com>  
+- Merge pull request #6 from garronej/dependabot/npm_and_yarn/lodash-4.17.21
+
+Bump lodash from 4.17.20 to 4.17.21  
+- Bump lodash from 4.17.20 to 4.17.21
+
+Bumps [lodash](https://github.com/lodash/lodash) from 4.17.20 to 4.17.21.
+- [Release notes](https://github.com/lodash/lodash/releases)
+- [Commits](https://github.com/lodash/lodash/compare/4.17.20...4.17.21)
+
+Signed-off-by: dependabot[bot] <support@github.com>  
+- Merge pull request #5 from garronej/dependabot/npm_and_yarn/node-fetch-2.6.1
+
+Bump node-fetch from 2.6.0 to 2.6.1    
+  
 ### **2.2.14** (2020-08-27)  
   
 - Do not use .ts files as types definition, use .d.ts files instead #4    
