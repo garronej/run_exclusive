@@ -34,6 +34,66 @@ This is a higher-level approach to the problem addressed by [`DirtyHairy/async-m
 - ✅ Lightweight, no dependency.
 - ✅ No polyfills needed, the NPM module is transpiled down to ES3   
 
+# Examples
+
+## Basic example
+
+```typescript
+import * as runExclusive from "run-exclusive";
+
+const f= runExclusive.build(async ()=> {
+
+    await new Promise(resolve=> setTimeout(resolve, 1000));
+
+    console.log("Hello world");
+
+});
+
+f();
+f();
+```
+Result:  
+```bash
+# One second..
+Hello World
+# One second
+Hello World
+```
+
+## Group of mutually run exclusive functions
+
+```typescript
+import * as runExclusive from "run-exclusive";
+
+const groupRef= runExclusive.createGroupRef();
+
+const f1= runExclusive.build(groupRef, async ()=> {
+
+    await new Promise(resolve=> setTimeout(resolve, 1000));
+
+    console.log("Hello world 1");
+
+});
+
+const f2= runExclusive.build(groupRef, async ()=> {
+
+    await new Promise(resolve=> setTimeout(resolve, 1000));
+
+    console.log("Hello world 2");
+
+});
+
+f1();
+f2();
+```
+Result:  
+```bash
+# One second..
+Hello World 1
+# One second
+Hello World 2
+```
+
 # Install / Import
 
 ## Deno
@@ -74,6 +134,9 @@ Thanks to Stackblitz you can try this lib within your browser like if you where 
 
 # Table of content
 
+- [Examples](#examples)
+  - [Basic example](#basic-example)
+  - [Group of mutually run exclusive functions](#group-of-mutually-run-exclusive-functions)
 - [Install / Import](#install--import)
   - [Deno](#deno)
   - [Other javascript runtime environnement:](#other-javascript-runtime-environnement)
