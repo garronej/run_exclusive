@@ -1,6 +1,6 @@
 //Import ExecStack to be able to export stacked function
 import * as runExclusive from "../../lib/runExclusive";
-import { VoidEvt } from "ts-evt";
+import { Evt } from "evt";
 
 export class MyClass {
 
@@ -28,7 +28,7 @@ export class MyClassProxy {
 
     private myClassInst: MyClass | undefined = undefined;
 
-    public readonly evtCreate = new VoidEvt();
+    public readonly evtCreate = Evt.create();
 
     public getAlphabet(): typeof MyClass.prototype.alphabet {
         if (!this.myClassInst) return "";

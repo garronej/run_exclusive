@@ -1,5 +1,5 @@
 import * as runExclusive from "../../lib/runExclusive";
-import {  Evt } from "ts-evt";
+import { Evt } from "evt";
 
 export class MyClass {
 

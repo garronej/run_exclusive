@@ -38,9 +38,9 @@
     },
     "devDependencies": {
         "@types/node": "^10.3.2",
-        "ts-evt": "^4.3.3",
+        "evt": "^2.3.0",
         "typescript": "^3.9.7",
-        "denoify": "^0.4.1",
+        "denoify": "^0.11.5",
         "simplifyify": "8.0.1",
         "terser": "4.8.1"
     },
