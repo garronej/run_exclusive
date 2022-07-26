@@ -37,7 +37,6 @@ jobs:
         npm test:node
   test_deno:
     runs-on: ubuntu-latest
-    needs: test_lint
     name: test with Deno
     steps: 
     - uses: actions/checkout@v2
