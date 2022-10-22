@@ -17,32 +17,23 @@ jobs:
         os: [ windows-latest, ubuntu-latest ]
     name: Test with Node v${{ matrix.node }} on ${{ matrix.os }}
     steps:
-    - name: Tell if project is using npm or yarn
-      id: step1
-      uses: garronej/ts-ci@v1.1.2
-      with: 
-        action_name: tell_if_project_uses_npm_or_yarn
-    - uses: actions/checkout@v2.3.4
-    - uses: actions/setup-node@v2.1.3
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node }}
     - uses: bahmutov/npm-install@v1
-    - if: steps.step1.outputs.npm_or_yarn == 'yarn'
-      run: |
-        yarn build
-        yarn test:node
-    - if: steps.step1.outputs.npm_or_yarn == 'npm'
-      run: |
-        npm run build
-        npm test:node
+    - run: yarn build
+    - run: yarn test:node
   test_deno:
     runs-on: ubuntu-latest
     name: test with Deno
     steps: 
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '15'
     - name: Cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.cache/deno
         key: deno-${{ runner.os }}-${{ hashFiles('deno-lock.json') }}
@@ -50,19 +41,14 @@ jobs:
            deno-${{ runner.os }}-${{ hashFiles('deno-lock.json') }}
            deno-${{ runner.os }}-
            deno-
-    - uses: denolib/setup-deno@master
+    - uses: denoland/setup-deno@v1
       with:
         deno-version: v1.x
     - run: deno --version
     - uses: bahmutov/npm-install@v1
     - run: |
-        PACKAGE_MANAGER=npm
-        if [ -f "./yarn.lock" ]; then
-            PACKAGE_MANAGER=yarn
-        fi
-        $PACKAGE_MANAGER run build
-        $PACKAGE_MANAGER run test:deno
-
+        yarn build
+        yarn test:deno
   check_if_version_upgraded:
     name: Check if version upgrade
     # We run this only if it's a push on the default branch or if it's a PR from a 
@@ -79,9 +65,9 @@ jobs:
       from_version: ${{ steps.step1.outputs.from_version }}
       to_version: ${{ steps.step1.outputs.to_version }}
       is_upgraded_version: ${{ steps.step1.outputs.is_upgraded_version }}
-      is_release_beta: ${{steps.step1.outputs.is_release_beta }}
+      is_pre_release: ${{steps.step1.outputs.is_pre_release }}
     steps:
-    - uses: garronej/ts-ci@v1.1.2
+    - uses: garronej/ts-ci@v2.1.0
       id: step1
       with: 
         action_name: is_package_json_version_upgraded
@@ -91,38 +77,30 @@ jobs:
     runs-on: ubuntu-latest
     needs: 
       - check_if_version_upgraded
-    # We create a release only if the version have been upgraded and we are on a default branch
-    # PR on the default branch can release beta but not real release
+    # We create a release only if the version have been upgraded and we are on the main branch
+    # or if we are on a branch of the repo that has an PR open on main.
     if: |
       needs.check_if_version_upgraded.outputs.is_upgraded_version == 'true' &&
       (
         github.event_name == 'push' ||
-        needs.check_if_version_upgraded.outputs.is_release_beta == 'true'
+        needs.check_if_version_upgraded.outputs.is_pre_release == 'true'
       )
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ github.ref }}
     - run: rm -r .github
-    - run: |
-        git branch -d latest || true
-        git push origin :latest || true
-    - run: |
-        git branch latest
-        git checkout latest
-    - uses: actions/setup-node@v2.1.3
+    - name: Remove tmp_branch if it exists
+      run: git push origin :tmp_branch || true
+    - run: git checkout -b tmp_branch
+    - uses: actions/setup-node@v3
       with:
-        node-version: '15'
         registry-url: https://registry.npmjs.org/
     - uses: bahmutov/npm-install@v1
-    - run: |
-        PACKAGE_MANAGER=npm
-        if [ -f "./yarn.lock" ]; then
-            PACKAGE_MANAGER=yarn
-        fi
-        $PACKAGE_MANAGER run build
-    - run: npx -y -p denoify@0.6.5 denoify_enable_short_npm_import_path
+    - run: yarn build
+    - run: npx -y -p denoify@1.3.0 enable_short_npm_import_path
+    - run: npx -y -p denoify@1.3.0 remove_deno_dist_from_gitignore
       env:
         DRY_RUN: "0"
     - run: |
@@ -134,24 +112,30 @@ jobs:
           echo "Can't publish on NPM, You must first create a secret called NPM_TOKEN that contains your NPM auth token. https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets"
           false
         fi
-        npm publish
+        EXTRA_ARGS=""
+        if [ "$IS_PRE_RELEASE" = "true" ]; then
+            EXTRA_ARGS="--tag next"
+        fi
+        npm publish $EXTRA_ARGS
       env:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
         VERSION: ${{ needs.check_if_version_upgraded.outputs.to_version }}
+        IS_PRE_RELEASE: ${{ needs.check_if_version_upgraded.outputs.is_pre_release }}
     - run: |
         git config --global user.name "actions"
-        git config --global user.email actions@example.com
+        git config --global user.email actions@github.com
         git add -A
-        git commit -am "Enabling shorter import paths"
-        git push origin latest
+        git commit -am "Adding deno distribution files and moving files from /dist to /"
+        git push origin tmp_branch
     - uses: softprops/action-gh-release@v1
       with:
         name: Release v${{ needs.check_if_version_upgraded.outputs.to_version }}
         tag_name: v${{ needs.check_if_version_upgraded.outputs.to_version }}
-        target_commitish: latest
-        generate_release_notes: true
+        target_commitish: tmp_branch
+        generate_release_notes: false
         draft: false
-        prerelease: ${{ needs.check_if_version_upgraded.outputs.is_release_beta == 'true' }}
+        prerelease: ${{ needs.check_if_version_upgraded.outputs.is_pre_release == 'true' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-
+    - name: Remove tmp_branch
+      run: git push origin :tmp_branch
