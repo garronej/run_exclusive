@@ -1,4 +1,4 @@
-
+// @denoify-line-ignore
 import { Polyfill as WeakMap } from "minimal-polyfills/WeakMap";
 
 class ExecQueue {
