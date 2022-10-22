@@ -17,7 +17,7 @@
     <a href="https://www.npmjs.com/package/run-exclusive">
       <img src="https://img.shields.io/npm/v/run-exclusive?logo=npm">
     </a>
-    <a href="https://deno.land/x/tsafe">
+    <a href="https://deno.land/x/run_exclusive">
         <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fdeno-visualizer.danopia.net%2Fshields%2Flatest-version%2Fx%2Frun_exclusive%2Fmod.ts">
     </a>  
     <a href="https://github.com/garronej/run-exclusive/blob/main/LICENSE">
