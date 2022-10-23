@@ -1,0 +1,21 @@
+"use strict";
+exports.__esModule = true;
+console.log("DENO TEST");
+require("./test1");
+require("./test2");
+require("./test3");
+require("./test4");
+require("./test5");
+require("./test6");
+require("./test7");
+require("./test8");
+require("./test9");
+require("./test10");
+require("./test11");
+require("./test13");
+require("./test14");
+require("./test15");
+require("./test16");
+require("./test17");
+require("./test18");
+//# sourceMappingURL=mod.js.map
