@@ -6,14 +6,8 @@
         "type": "git",
         "url": "git://github.com/garronej/run_exclusive.git"
     },
-    "scripts": {
-        "test:node": "node ./dist/test",
-        "test:deno": "deno run --reload ./deno_dist/test/mod.ts",
-        "test": "npm run test:node && npm run test:deno",
-        "build": "tsc && denoify"
-    },
-    "main": "dist/lib/runExclusive.js",
-    "types": "dist/lib/runExclusive.d.ts",
+    "main": "lib/runExclusive.js",
+    "types": "lib/runExclusive.d.ts",
     "author": "u/garronej",
     "license": "MIT",
     "keywords": [
@@ -37,10 +31,9 @@
         "denoify": "^1.5.3"
     },
     "files": [
-        "src/",
-        "!src/test/",
-        "dist/",
-        "!dist/test/",
-        "!dist/tsconfig.tsbuildinfo"
+        "src/lib/runExclusive.ts",
+        "lib/runExclusive.d.ts",
+        "lib/runExclusive.js",
+        "lib/runExclusive.js.map"
     ]
 }
